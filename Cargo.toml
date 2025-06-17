@@ -399,6 +399,10 @@ features = [
 	"bzip2",
 ]
 
+[workspace.dependencies.surrealdb]
+version = "2.3.4"
+features = ["kv-rocksdb"]
+
 [workspace.dependencies.sha2]
 version = "0.10.8"
 default-features = false
