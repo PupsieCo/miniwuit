@@ -388,8 +388,8 @@ features = [
 ]
 
 [workspace.dependencies.rust-rocksdb]
-git = "https://github.com/girlbossceo/rust-rocksdb-zaidoon1"
-rev = "1c267e0bf0cc7b7702e9a329deccd89de79ef4c3"
+git = "ssh://git@gitlab.com/pupsieco/rust-rocksdb-zaidoon1.git"
+rev = "3fdfd1b35cef9e3fa4e5c25d69953a78b0087f2b"
 default-features = false
 features = [
 	"multi-threaded-cf",
@@ -400,7 +400,8 @@ features = [
 ]
 
 [workspace.dependencies.surrealdb]
-version = "2.3.4"
+git = "ssh://git@gitlab.com/pupsieco/surrealdb.git"
+rev = "4fc22e49094e653f4a0603ae413b301ee0c75b28"
 features = ["kv-rocksdb"]
 
 [workspace.dependencies.sha2]
