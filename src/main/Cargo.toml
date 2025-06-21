@@ -53,7 +53,7 @@ blurhashing = [
 	"conduwuit-service/blurhashing",
 ]
 brotli_compression = [
-	"conduwuit-api/brotli_compression",
+	"conduwuit-matrix-api/brotli_compression",
 	"conduwuit-core/brotli_compression",
 	"conduwuit-router/brotli_compression",
 	"conduwuit-service/brotli_compression",
@@ -65,11 +65,11 @@ direct_tls = [
     "conduwuit-router/direct_tls"
 ]
 element_hacks = [
-	"conduwuit-api/element_hacks",
+	"conduwuit-matrix-api/element_hacks",
 	"conduwuit-service/element_hacks",
 ]
 gzip_compression = [
-	"conduwuit-api/gzip_compression",
+	"conduwuit-matrix-api/gzip_compression",
 	"conduwuit-router/gzip_compression",
 	"conduwuit-service/gzip_compression",
 ]
@@ -112,7 +112,7 @@ release_max_log_level = [
 	"log/max_level_trace",
 	"log/release_max_level_info",
 	"conduwuit-admin/release_max_log_level",
-	"conduwuit-api/release_max_log_level",
+	"conduwuit-matrix-api/release_max_log_level",
 	"conduwuit-core/release_max_log_level",
 	"conduwuit-database/release_max_log_level",
 	"conduwuit-router/release_max_log_level",
@@ -137,7 +137,7 @@ url_preview = [
 	"conduwuit-service/url_preview",
 ]
 zstd_compression = [
-    "conduwuit-api/zstd_compression",
+    "conduwuit-matrix-api/zstd_compression",
 	"conduwuit-core/zstd_compression",
 	"conduwuit-database/zstd_compression",
 	"conduwuit-router/zstd_compression",
@@ -148,7 +148,7 @@ conduwuit_mods = [
 
 [dependencies]
 conduwuit-admin.workspace = true
-conduwuit-api.workspace = true
+conduwuit-matrix-api.workspace = true
 conduwuit-core.workspace = true
 conduwuit-database.workspace = true
 conduwuit-router.workspace = true

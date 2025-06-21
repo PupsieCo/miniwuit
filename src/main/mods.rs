@@ -28,7 +28,7 @@ const MODULE_NAMES: &[&str] = &[
 	//"conduwuit_core",
 	"conduwuit_database",
 	"conduwuit_service",
-	"conduwuit_api",
+	"conduwuit_matrix_api",
 	"conduwuit_admin",
 	"conduwuit_router",
 ];

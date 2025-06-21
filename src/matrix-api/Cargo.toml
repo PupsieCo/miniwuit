@@ -1,5 +1,5 @@
 [package]
-name = "conduwuit_api"
+name = "conduwuit_matrix_api"
 categories.workspace = true
 description.workspace = true
 edition.workspace = true

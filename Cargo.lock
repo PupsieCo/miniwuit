@@ -1188,9 +1188,9 @@ version = "0.5.0"
 dependencies = [
  "clap",
  "conduwuit_admin",
- "conduwuit_api",
  "conduwuit_core",
  "conduwuit_database",
+ "conduwuit_matrix_api",
  "conduwuit_router",
  "conduwuit_service",
  "console-subscriber",
@@ -1216,10 +1216,10 @@ name = "conduwuit_admin"
 version = "0.5.0"
 dependencies = [
  "clap",
- "conduwuit_api",
  "conduwuit_core",
  "conduwuit_database",
  "conduwuit_macros",
+ "conduwuit_matrix_api",
  "conduwuit_service",
  "const-str",
  "futures",
@@ -1230,39 +1230,6 @@ dependencies = [
  "tokio",
  "tracing",
  "tracing-subscriber",
-]
-
-[[package]]
-name = "conduwuit_api"
-version = "0.5.0"
-dependencies = [
- "async-trait",
- "axum",
- "axum-client-ip",
- "axum-extra",
- "base64 0.22.1",
- "bytes",
- "conduwuit_core",
- "conduwuit_database",
- "conduwuit_service",
- "const-str",
- "futures",
- "hmac",
- "http",
- "http-body-util",
- "hyper",
- "ipaddress",
- "itertools 0.14.0",
- "log",
- "rand 0.8.5",
- "reqwest",
- "ruma",
- "serde",
- "serde_html_form",
- "serde_json",
- "sha1",
- "tokio",
- "tracing",
 ]
 
 [[package]]
@@ -1352,6 +1319,39 @@ dependencies = [
 ]
 
 [[package]]
+name = "conduwuit_matrix_api"
+version = "0.5.0"
+dependencies = [
+ "async-trait",
+ "axum",
+ "axum-client-ip",
+ "axum-extra",
+ "base64 0.22.1",
+ "bytes",
+ "conduwuit_core",
+ "conduwuit_database",
+ "conduwuit_service",
+ "const-str",
+ "futures",
+ "hmac",
+ "http",
+ "http-body-util",
+ "hyper",
+ "ipaddress",
+ "itertools 0.14.0",
+ "log",
+ "rand 0.8.5",
+ "reqwest",
+ "ruma",
+ "serde",
+ "serde_html_form",
+ "serde_json",
+ "sha1",
+ "tokio",
+ "tracing",
+]
+
+[[package]]
 name = "conduwuit_router"
 version = "0.5.0"
 dependencies = [
@@ -1361,8 +1361,8 @@ dependencies = [
  "axum-server-dual-protocol",
  "bytes",
  "conduwuit_admin",
- "conduwuit_api",
  "conduwuit_core",
+ "conduwuit_matrix_api",
  "conduwuit_service",
  "const-str",
  "futures",

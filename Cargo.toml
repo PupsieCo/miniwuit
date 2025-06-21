@@ -606,9 +606,9 @@ package = "conduwuit_admin"
 path = "src/admin"
 default-features = false
 
-[workspace.dependencies.conduwuit-api]
-package = "conduwuit_api"
-path = "src/api"
+[workspace.dependencies.conduwuit-matrix-api]
+package = "conduwuit_matrix_api"
+path = "src/matrix-api"
 default-features = false
 
 [workspace.dependencies.conduwuit-service]
