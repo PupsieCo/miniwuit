@@ -16,7 +16,7 @@ pub struct Context {
 impl Context {
     pub async fn new(server: &Arc<Server>) -> Result<Arc<Self>> {
         let config = Self::extract_config(server)?;
-        let pool = ConnectionPool::new(&config).await?;
+        let pool = ConnectionPool::new(config.clone()).await?;
         
         Ok(Arc::new(Self {
             server: server.clone(),

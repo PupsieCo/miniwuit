@@ -112,3 +112,50 @@ fn default_idle_timeout() -> u64 {
 fn default_true() -> bool {
     true
 }
+
+impl Default for SurrealConfig {
+    fn default() -> Self {
+        Self {
+            connection: default_connection(),
+            namespace: "conduwuit".to_string(),
+            database: "main".to_string(),
+            auth: SurrealAuthConfig::default(),
+            pool: SurrealPoolConfig::default(),
+            query_timeout: default_query_timeout(),
+            transaction_timeout: default_transaction_timeout(),
+            strict_mode: false,
+            capabilities: SurrealCapabilities::default(),
+        }
+    }
+}
+
+impl Default for SurrealAuthConfig {
+    fn default() -> Self {
+        Self {
+            username: None,
+            password: None,
+            token: None,
+        }
+    }
+}
+
+impl Default for SurrealPoolConfig {
+    fn default() -> Self {
+        Self {
+            max_connections: default_max_connections(),
+            connection_timeout: default_connection_timeout(),
+            idle_timeout: default_idle_timeout(),
+        }
+    }
+}
+
+impl Default for SurrealCapabilities {
+    fn default() -> Self {
+        Self {
+            allow_functions: default_true(),
+            allow_network: false,
+            allow_scripting: false,
+            allow_guests: false,
+        }
+    }
+}

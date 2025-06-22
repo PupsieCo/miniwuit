@@ -169,3 +169,37 @@ pub fn to_conduwuit_error(e: Error) -> conduwuit::Error {
 pub fn from_conduwuit_result<T>(result: CoreResult<T>) -> Result<T> {
     result.map_err(|e| Error::Config(e.to_string()))
 }
+
+/// Convert our Error to conduwuit::Error
+impl From<Error> for conduwuit::Error {
+    fn from(e: Error) -> Self {
+        conduwuit::err!("{e}")
+    }
+}
+
+/// Convert conduwuit::Error to our Error
+impl From<conduwuit::Error> for Error {
+    fn from(e: conduwuit::Error) -> Self {
+        Error::Config(e.to_string())
+    }
+}
+
+/// Universal error conversion helper for SurrealDB operations
+pub fn convert_surreal_error<T>(result: std::result::Result<T, surrealdb::Error>) -> Result<T> {
+    result.map_err(|e| Error::Surreal(e))
+}
+
+/// Helper for converting SurrealDB results to conduwuit results
+pub fn to_conduwuit_result<T>(result: Result<T>) -> conduwuit::Result<T> {
+    result.map_err(|e| conduwuit::err!("{e}"))
+}
+
+/// Conversion helper specifically for query operations
+pub fn convert_query_result<T>(result: std::result::Result<T, surrealdb::Error>) -> Result<T> {
+    result.map_err(|e| Error::Query(format!("SurrealDB query failed: {e}")))
+}
+
+/// Conversion helper specifically for connection operations  
+pub fn convert_connection_result<T>(result: std::result::Result<T, surrealdb::Error>) -> Result<T> {
+    result.map_err(|e| Error::Connection(format!("SurrealDB connection failed: {e}")))
+}

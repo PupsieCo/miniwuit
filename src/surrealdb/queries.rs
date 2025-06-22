@@ -5,7 +5,7 @@ use conduwuit::{Result, debug, trace};
 
 use crate::{
     engine::Engine,
-    error::{Error, Result as SurrealResult},
+    error::{Error, Result as SurrealResult, convert_surreal_error},
 };
 
 /// Common SurrealDB query patterns and schema management
@@ -181,15 +181,13 @@ impl QueryBuilder {
         let query = format!("INFO FOR TABLE {};", table_name);
         let mut response = self.engine.query(&query).await?;
         
-        if let Some(result) = response.pop() {
-            result.result.map_err(|e| Error::Query(format!("Failed to get table info: {}", e)))
-        } else {
-            Err(Error::Query("No response from table info query".to_string()))
-        }
+        // Use the take method to extract values from response
+        let result: Option<Value> = response.take(0).unwrap_or_default();
+        Ok(result.unwrap_or(Value::None))
     }
     
     /// Create a record
-    pub async fn create_record<T>(&self, table: &str, data: &T) -> SurrealResult<Value>
+    pub async fn create_record<T>(&self, table: &str, data: T) -> SurrealResult<Value>
     where
         T: Serialize,
     {
@@ -201,11 +199,8 @@ impl QueryBuilder {
             .await
             .map_err(Error::from)?;
             
-        if let Some(result) = response.take::<Option<Value>>(0)? {
-            Ok(result.unwrap_or(Value::None))
-        } else {
-            Err(Error::Query("No result from create query".to_string()))
-        }
+        let result: Option<Value> = response.take(0).unwrap_or_default();
+        Ok(result.unwrap_or(Value::None))
     }
     
     /// Select records with optional conditions
@@ -220,24 +215,12 @@ impl QueryBuilder {
         
         let mut response = self.engine.query(&query).await?;
         
-        if let Some(result) = response.pop() {
-            match result.result {
-                Ok(value) => {
-                    if let Value::Array(arr) = value {
-                        Ok(arr.into_iter().collect())
-                    } else {
-                        Ok(vec![value])
-                    }
-                }
-                Err(e) => Err(Error::Query(format!("Failed to select records: {}", e)))
-            }
-        } else {
-            Ok(vec![])
-        }
+        let result: Option<Vec<Value>> = response.take(0).unwrap_or_default();
+        Ok(result.unwrap_or_default())
     }
     
     /// Update records
-    pub async fn update_record<T>(&self, table: &str, id: &str, data: &T) -> SurrealResult<Value>
+    pub async fn update_record<T>(&self, table: &str, id: &str, data: T) -> SurrealResult<Value>
     where
         T: Serialize,
     {
@@ -249,11 +232,8 @@ impl QueryBuilder {
             .await
             .map_err(Error::from)?;
             
-        if let Some(result) = response.take::<Option<Value>>(0)? {
-            Ok(result.unwrap_or(Value::None))
-        } else {
-            Err(Error::Query("No result from update query".to_string()))
-        }
+        let result: Option<Value> = response.take(0).unwrap_or_default();
+        Ok(result.unwrap_or(Value::None))
     }
     
     /// Delete records
@@ -263,11 +243,8 @@ impl QueryBuilder {
         let query = format!("DELETE {}:{};", table, id);
         let mut response = self.engine.query(&query).await?;
         
-        if let Some(result) = response.pop() {
-            result.result.map_err(|e| Error::Query(format!("Failed to delete record: {}", e)))
-        } else {
-            Err(Error::Query("No response from delete query".to_string()))
-        }
+        let result: Option<Value> = response.take(0).unwrap_or_default();
+        Ok(result.unwrap_or(Value::None))
     }
     
     /// Execute a custom query with parameters
@@ -278,12 +255,12 @@ impl QueryBuilder {
         
         if let Some(params) = params {
             for (key, value) in params {
-                query_builder = query_builder.bind((key.as_str(), value));
+                query_builder = query_builder.bind((key.clone(), value));
             }
         }
         
         query_builder.await
-            .map(|response| response.into())
+            .map(|response| vec![response])
             .map_err(Error::from)
     }
     
@@ -307,11 +284,8 @@ impl QueryBuilder {
         let query = "INFO FOR DB;";
         let mut response = self.engine.query(query).await?;
         
-        if let Some(result) = response.pop() {
-            result.result.map_err(|e| Error::Query(format!("Failed to get stats: {}", e)))
-        } else {
-            Err(Error::Query("No response from stats query".to_string()))
-        }
+        let result: Option<Value> = response.take(0).unwrap_or_default();
+        Ok(result.unwrap_or(Value::None))
     }
     
     /// Optimize database

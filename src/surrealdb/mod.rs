@@ -11,6 +11,7 @@ mod pool;
 mod service;
 mod connection;
 mod queries;
+mod error;
 
 #[cfg(test)]
 mod tests;
@@ -23,11 +24,11 @@ pub use self::{
     connection::{Connection, ConnectionFactory, HealthChecker, ConnectionStats},
     pool::{ConnectionPool, PooledConnection},
     queries::{QueryBuilder, TableSchema, FieldDefinition, IndexDefinition},
-    //error::{Error, Result},
+    error::{Error, Result},
 };
 
 use std::sync::Arc;
-use conduwuit::{Result as CoreResult, Server, error, debug, info, warn};
+use conduwuit::{Result as CoreResult, Server, debug, info, warn};
 
 pub struct SurrealDB {
     pub engine: Arc<Engine>,
@@ -49,9 +50,8 @@ impl SurrealDB {
     }
     
     /// Execute query with error handling
-    pub async fn query(&self, sql: &str) -> CoreResult<surrealdb::Response> {
-        let res = self.engine.query(sql).await
-            .map_err(|e| Err(error!("SurrealDB query failed: {e}")));
-        Ok(res.unwrap())
+    pub async fn query(&self, sql: &str) -> CoreResult<Vec<surrealdb::Response>> {
+        self.engine.query(sql).await
+            .map_err(|e| conduwuit::err!("SurrealDB query failed: {e}"))
     }
 }

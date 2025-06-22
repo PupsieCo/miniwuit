@@ -6,7 +6,7 @@ use crate::{
     config::{SurrealConfig, SurrealConnection},
     context::Context,
     pool::ConnectionPool,
-    error::Error,
+    error::{Error, convert_surreal_error, convert_connection_result},
 };
 
 pub struct Engine {
@@ -22,17 +22,21 @@ impl Engine {
         debug!("Connection mode: {:?}", ctx.config.connection);
         let db = match &ctx.config.connection {
             SurrealConnection::Memory => {
-                Surreal::new::<surrealdb::engine::local::Mem>(()).await?
+                convert_connection_result(
+                    Surreal::new::<surrealdb::engine::local::Mem>(()).await
+                ).map_err(|e| conduwuit::err!("{e}"))?
             }
             SurrealConnection::File { path } => {
-                Surreal::new::<surrealdb::engine::local::File>(path).await?
+                convert_connection_result(
+                    Surreal::new::<surrealdb::engine::local::File>(path.clone()).await
+                ).map_err(|e| conduwuit::err!("{e}"))?
             }
             SurrealConnection::Remote { url } => {
                 Surreal::new::<Any>(url.as_str()).await?
             }
             SurrealConnection::TiKV { endpoints } => {
                 let endpoint = endpoints.first()
-                    .ok_or_else(|| error!("No TiKV endpoints provided"))?;
+                    .ok_or_else(|| conduwuit::err!("No TiKV endpoints provided"))?;
                 Surreal::new::<surrealdb::engine::remote::tikv::TiKv>(endpoint).await?
             }
             SurrealConnection::FoundationDB { cluster_file } => {
@@ -78,9 +82,10 @@ impl Engine {
     /// Execute a query with automatic connection management
     pub async fn query(&self, sql: &str) -> Result<Vec<Response>> {
         debug!("Executing query: {}", sql);
-        let result = self.db.query(sql).await?;
+        let result = convert_surreal_error(self.db.query(sql).await)
+            .map_err(|e| conduwuit::err!("{e}"))?;
         // TODO: Proper handling if query fails
-        Ok(result.into())
+        Ok(vec![result])
     }
     
     /// Update database schema
@@ -94,7 +99,8 @@ impl Engine {
     /// Health check
     pub async fn ping(&self) -> Result<()> {
         info!("Pinging SurrealDB engine");
-        self.db.health().await?;
+        convert_surreal_error(self.db.health().await)
+            .map_err(|e| conduwuit::err!("{e}"))?;
         // TODO: Proper handling if health check fails
         Ok(())
     }
