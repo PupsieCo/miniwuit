@@ -1,5 +1,5 @@
 use conduwuit::Result;
-use conduwuit_macros::implement;
+use conduwuit_social_macros::implement;
 use futures::StreamExt;
 use ruma::events::room::message::RoomMessageEventContent;
 

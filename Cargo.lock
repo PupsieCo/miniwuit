@@ -1225,7 +1225,7 @@ dependencies = [
  "checked_ops",
  "chrono",
  "clap",
- "conduwuit_macros",
+ "conduwuit_social_macros",
  "const-str",
  "core_affinity",
  "ctor",
@@ -1288,7 +1288,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "conduwuit_macros"
+name = "conduwuit_social_macros"
 version = "0.5.0"
 dependencies = [
  "itertools 0.14.0",
@@ -1337,7 +1337,7 @@ dependencies = [
  "clap",
  "conduwuit_core",
  "conduwuit_database",
- "conduwuit_macros",
+ "conduwuit_social_macros",
  "conduwuit_social_api",
  "conduwuit_social_service",
  "const-str",

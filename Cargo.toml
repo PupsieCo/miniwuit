@@ -626,9 +626,9 @@ package = "conduwuit_core"
 path = "src/core"
 default-features = false
 
-[workspace.dependencies.conduwuit-macros]
-package = "conduwuit_macros"
-path = "src/macros"
+[workspace.dependencies.conduwuit-social-macros]
+package = "conduwuit_social_macros"
+path = "src/social-macros"
 default-features = false
 
 ###############################################################################
@@ -686,7 +686,7 @@ codegen-units = 32
 #	'-Clink-arg=-Wl,--no-gc-sections',
 #]
 
-[profile.release-max-perf.package.conduwuit_macros]
+[profile.release-max-perf.package.conduwuit_social_macros]
 inherits = "release-max-perf.build-override"
 #rustflags = [
 #	'-Crelocation-model=pic',

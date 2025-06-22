@@ -20,7 +20,7 @@ pub mod sys;
 mod tests;
 pub mod time;
 
-pub use ::conduwuit_macros::implement;
+pub use ::conduwuit_social_macros::implement;
 pub use ::ctor::{ctor, dtor};
 
 pub use self::{
