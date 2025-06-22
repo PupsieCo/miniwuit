@@ -1,6 +1,6 @@
 use std::sync::Arc;
 use async_trait::async_trait;
-use conduwuit::{Result, Server, error, debug};
+use conduwuit::{Result, Server, debug, info, warn};
 use tokio::sync::OnceCell;
 
 use crate::{
@@ -13,29 +13,59 @@ pub struct Service {
     engine: OnceCell<Arc<Engine>>,
 }
 
-#[async_trait]
-impl conduwuit::Service for Service {
-    fn build(args: conduwuit::Args<'_>) -> Result<Arc<Self>> {
-        Ok(Arc::new(Self {
-            server: args.server.clone(),
+impl Service {
+    pub fn new(server: Arc<Server>) -> Arc<Self> {
+        Arc::new(Self {
+            server,
             engine: OnceCell::new(),
-        }))
+        })
     }
     
-    async fn worker(self: Arc<Self>) -> Result {
-        // Initialize the engine on first run
-        let engine = self.engine.get_or_try_init(|| async {
-            let ctx = Context::new(&self.server)?;
-            Engine::open(ctx).await
-        }).await?;
+    pub async fn start(&self) -> Result<()> {
+        info!("Starting SurrealDB service");
         
+        // Initialize the engine
+        let ctx = Context::new(&self.server).await?;
+        let engine = Engine::open(ctx).await?;
+        
+        if let Err(_) = self.engine.set(engine) {
+            warn!("SurrealDB engine was already initialized");
+        }
+        
+        Ok(())
+    }
+    
+    pub async fn stop(&self) -> Result<()> {
+        info!("Stopping SurrealDB service");
+        Ok(())
+    }
+    
+    pub async fn ready(&self) -> Result<()> {
+        debug!("SurrealDB service ready check");
+        if let Some(engine) = self.engine.get() {
+            engine.ping().await?;
+        }
+        Ok(())
+    }
+    
+    pub fn name(&self) -> &str {
+        "surrealdb"
+    }
+    
+    pub fn get_engine(&self) -> Option<&Arc<Engine>> {
+        self.engine.get()
+    }
+    
+    async fn worker(self: Arc<Self>) -> Result<()> {
         debug!("SurrealDB service worker started");
         
         // Background maintenance tasks
         while self.server.running() {
-            // Health checks
-            if let Err(e) = engine.ping().await {
-                error!("SurrealDB health check failed: {e}");
+            if let Some(engine) = self.engine.get() {
+                // Health checks
+                if let Err(e) = engine.ping().await {
+                    warn!("SurrealDB health check failed: {e}");
+                }
             }
             
             // Wait before next maintenance cycle
@@ -44,9 +74,5 @@ impl conduwuit::Service for Service {
         
         debug!("SurrealDB service worker stopped");
         Ok(())
-    }
-    
-    fn name(&self) -> &str {
-        conduwuit::service::make_name(std::module_path!())
     }
 }

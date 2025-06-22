@@ -189,7 +189,7 @@ impl QueryBuilder {
     /// Create a record
     pub async fn create_record<T>(&self, table: &str, data: T) -> SurrealResult<Value>
     where
-        T: Serialize,
+        T: Serialize + 'static,
     {
         trace!("Creating record in table: {}", table);
         
@@ -222,7 +222,7 @@ impl QueryBuilder {
     /// Update records
     pub async fn update_record<T>(&self, table: &str, id: &str, data: T) -> SurrealResult<Value>
     where
-        T: Serialize,
+        T: Serialize + 'static,
     {
         trace!("Updating record in table: {} with id: {}", table, id);
         
@@ -265,7 +265,7 @@ impl QueryBuilder {
     }
     
     /// Execute a transaction
-    pub async fn execute_transaction(&self, queries: Vec<&str>) -> SurrealResult<Vec<Response>> {
+    pub async fn execute_transaction(&self, queries: Vec<&str>) -> SurrealResult<Response> {
         debug!("Executing transaction with {} queries", queries.len());
         
         let transaction_query = format!(

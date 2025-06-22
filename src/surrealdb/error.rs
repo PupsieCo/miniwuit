@@ -184,6 +184,13 @@ impl From<conduwuit::Error> for Error {
     }
 }
 
+/// Convert SurrealDB error to conduwuit Error
+impl From<surrealdb::Error> for conduwuit::Error {
+    fn from(e: surrealdb::Error) -> Self {
+        conduwuit::err!("SurrealDB error: {e}")
+    }
+}
+
 /// Universal error conversion helper for SurrealDB operations
 pub fn convert_surreal_error<T>(result: std::result::Result<T, surrealdb::Error>) -> Result<T> {
     result.map_err(|e| Error::Surreal(e))

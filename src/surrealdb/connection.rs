@@ -61,33 +61,27 @@ impl Connection {
             SurrealConnection::Memory => {
                 debug!("Establishing SurrealDB memory connection");
                 Surreal::new::<surrealdb::engine::local::Mem>(()).await
-                    .map_err(|e| error!("Failed to create memory connection: {e}"))?
+                    .map_err(|e| Error::Connection(format!("Failed to create memory connection: {e}")))?
+                    .into()
             }
             SurrealConnection::File { path } => {
                 debug!("Establishing SurrealDB file connection to: {}", path.display());
                 Surreal::new::<surrealdb::engine::local::File>(path.clone()).await
                     .map_err(|e| Error::Connection(format!("Failed to create file connection: {e}")))?
+                    .into()
             }
             // RocksDB and SurrealKv variants removed as they're not in the SurrealConnection enum
             SurrealConnection::Remote { url } => {
                 debug!("Establishing SurrealDB remote connection to: {}", url);
-                Surreal::new::<Any>(url.as_str()).await
-                    .map_err(|e| error!("Failed to create remote connection: {e}"))?
+                Surreal::new::<surrealdb::engine::remote::ws::Ws>(url.as_str()).await
+                    .map_err(|e| Error::Connection(format!("Failed to create remote connection: {e}")))?
+                    .into()
             }
-            SurrealConnection::TiKV { endpoints } => {
-                let endpoint = endpoints.first()
-                    .ok_or_else(|| Error::Config("No TiKV endpoints provided".to_string()))?;
-                debug!("Establishing SurrealDB TiKV connection to: {}", endpoint);
-                Surreal::new::<surrealdb::engine::remote::tikv::TiKv>(endpoint).await
-                    .map_err(|e| error!("Failed to create TiKV connection: {e}"))?
+            SurrealConnection::TiKV { endpoints: _ } => {
+                return Err(Error::Config("TiKV connection not supported in this SurrealDB build".to_string()));
             }
-            SurrealConnection::FoundationDB { cluster_file } => {
-                let path = cluster_file.as_ref()
-                    .map(|p| p.to_string_lossy())
-                    .unwrap_or_else(|| "".into());
-                debug!("Establishing SurrealDB FoundationDB connection");
-                Surreal::new::<surrealdb::engine::remote::fdb::Fdb>(path.as_ref()).await
-                    .map_err(|e| error!("Failed to create FoundationDB connection: {e}"))?
+            SurrealConnection::FoundationDB { cluster_file: _ } => {
+                return Err(Error::Config("FoundationDB connection not supported in this SurrealDB build".to_string()));
             }
         };
         
@@ -113,7 +107,7 @@ impl Connection {
             debug!("Authenticating with JWT token");
             db.authenticate(token).await
                 .map_err(|e| Error::Authentication(format!("JWT authentication failed: {e}")))?;
-        } else if let (Some(ref username), Some(ref password)) = (&auth.username, &auth.password) {
+        } else if let (Some(username), Some(password)) = (&auth.username, &auth.password) {
             debug!("Authenticating with root credentials");
                         db.signin(surrealdb::opt::auth::Root {
                 username,
@@ -149,7 +143,7 @@ impl Connection {
     }
     
     /// Execute a query with error handling and metrics
-    pub async fn query(&self, sql: &str) -> Result<Vec<Response>> {
+    pub async fn query(&self, sql: &str) -> Result<Response> {
         self.update_last_used().await;
         self.query_count.fetch_add(1, Ordering::Relaxed);
         
@@ -165,17 +159,17 @@ impl Connection {
         ).await {
             Ok(Ok(result)) => {
                 self.is_healthy.store(true, Ordering::Relaxed);
-                Ok(vec![result])
+                Ok(result)
             }
             Ok(Err(e)) => {
                 self.error_count.fetch_add(1, Ordering::Relaxed);
                 self.is_healthy.store(false, Ordering::Relaxed);
-                Err(Error::Query(format!("SurrealDB query failed: {e}")))
+                Err(Error::Query(format!("SurrealDB query failed: {e}")).into())
             }
             Err(_) => {
                 self.error_count.fetch_add(1, Ordering::Relaxed);
                 self.is_healthy.store(false, Ordering::Relaxed);
-                Err(Error::Timeout(format!("SurrealDB query timeout after {}s", self.config.query_timeout)))
+                Err(Error::Timeout(format!("SurrealDB query timeout after {}s", self.config.query_timeout)).into())
             }
         }
     }
@@ -207,7 +201,7 @@ impl Connection {
             Err(_) => {
                 self.error_count.fetch_add(1, Ordering::Relaxed);
                 self.is_healthy.store(false, Ordering::Relaxed);
-                Err(Error::Timeout(format!("SurrealDB transaction timeout after {}s", self.config.transaction_timeout)))
+                Err(Error::Timeout(format!("SurrealDB transaction timeout after {}s", self.config.transaction_timeout)).into())
             }
         }
     }
@@ -226,11 +220,11 @@ impl Connection {
             }
             Ok(Err(e)) => {
                 self.is_healthy.store(false, Ordering::Relaxed);
-                Err(Error::Health(format!("Health check failed: {e}")))
+                Err(Error::Health(format!("Health check failed: {e}")).into())
             }
             Err(_) => {
                 self.is_healthy.store(false, Ordering::Relaxed);
-                Err(Error::Timeout("Health check timeout".to_string()))
+                Err(Error::Timeout("Health check timeout".to_string()).into())
             }
         }
     }
@@ -286,6 +280,7 @@ impl ConnectionFactory {
     pub async fn create_connection(&self) -> Result<Connection> {
         let id = self.next_id.fetch_add(1, Ordering::Relaxed);
         Connection::new(self.config.clone(), id).await
+            .map_err(|e| e.into())
     }
     
     /// Get the configuration

@@ -50,7 +50,7 @@ impl SurrealDB {
     }
     
     /// Execute query with error handling
-    pub async fn query(&self, sql: &str) -> CoreResult<Vec<surrealdb::Response>> {
+    pub async fn query(&self, sql: &str) -> CoreResult<surrealdb::Response> {
         self.engine.query(sql).await
             .map_err(|e| conduwuit::err!("SurrealDB query failed: {e}"))
     }

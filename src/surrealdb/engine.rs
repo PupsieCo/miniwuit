@@ -22,28 +22,25 @@ impl Engine {
         debug!("Connection mode: {:?}", ctx.config.connection);
         let db = match &ctx.config.connection {
             SurrealConnection::Memory => {
-                convert_connection_result(
-                    Surreal::new::<surrealdb::engine::local::Mem>(()).await
-                ).map_err(|e| conduwuit::err!("{e}"))?
+                Surreal::new::<surrealdb::engine::local::Mem>(()).await
+                    .map_err(|e| conduwuit::err!("Failed to create memory connection: {e}"))?
+                    .into()
             }
             SurrealConnection::File { path } => {
-                convert_connection_result(
-                    Surreal::new::<surrealdb::engine::local::File>(path.clone()).await
-                ).map_err(|e| conduwuit::err!("{e}"))?
+                Surreal::new::<surrealdb::engine::local::File>(path.clone()).await
+                    .map_err(|e| conduwuit::err!("Failed to create file connection: {e}"))?
+                    .into()
             }
             SurrealConnection::Remote { url } => {
-                Surreal::new::<Any>(url.as_str()).await?
+                Surreal::new::<surrealdb::engine::remote::ws::Ws>(url.as_str()).await
+                    .map_err(|e| conduwuit::err!("Failed to create remote connection: {e}"))?
+                    .into()
             }
-            SurrealConnection::TiKV { endpoints } => {
-                let endpoint = endpoints.first()
-                    .ok_or_else(|| conduwuit::err!("No TiKV endpoints provided"))?;
-                Surreal::new::<surrealdb::engine::remote::tikv::TiKv>(endpoint).await?
+            SurrealConnection::TiKV { endpoints: _ } => {
+                return Err(conduwuit::err!("TiKV connection not supported in this SurrealDB build"));
             }
-            SurrealConnection::FoundationDB { cluster_file } => {
-                let path = cluster_file.as_ref()
-                    .map(|p| p.to_string_lossy())
-                    .unwrap_or_else(|| "".into());
-                Surreal::new::<surrealdb::engine::remote::fdb::Fdb>(path.as_ref()).await?
+            SurrealConnection::FoundationDB { cluster_file: _ } => {
+                return Err(conduwuit::err!("FoundationDB connection not supported in this SurrealDB build"));
             }
         };
 
@@ -80,12 +77,11 @@ impl Engine {
     }
     
     /// Execute a query with automatic connection management
-    pub async fn query(&self, sql: &str) -> Result<Vec<Response>> {
+    pub async fn query(&self, sql: &str) -> Result<surrealdb::Response> {
         debug!("Executing query: {}", sql);
-        let result = convert_surreal_error(self.db.query(sql).await)
-            .map_err(|e| conduwuit::err!("{e}"))?;
+        let result = self.db.query(sql).await?;
         // TODO: Proper handling if query fails
-        Ok(vec![result])
+        Ok(result)
     }
     
     /// Update database schema
