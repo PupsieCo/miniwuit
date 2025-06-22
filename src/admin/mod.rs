@@ -19,7 +19,7 @@ pub(crate) mod room;
 pub(crate) mod server;
 pub(crate) mod user;
 
-extern crate conduwuit_matrix_api as api;
+extern crate conduwuit_social_api as api;
 extern crate conduwuit_core as conduwuit;
 extern crate conduwuit_service as service;
 

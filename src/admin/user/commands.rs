@@ -7,7 +7,7 @@ use conduwuit::{
 	utils::{self, ReadyExt},
 	warn,
 };
-use conduwuit_matrix_api::client::{leave_all_rooms, update_avatar_url, update_displayname};
+use conduwuit_social_api::client::{leave_all_rooms, update_avatar_url, update_displayname};
 use futures::StreamExt;
 use ruma::{
 	EventId, OwnedRoomId, OwnedRoomOrAliasId, OwnedUserId, RoomId, UserId,
