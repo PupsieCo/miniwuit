@@ -9,7 +9,7 @@ use conduwuit::{
 	},
 };
 use conduwuit_database::Map;
-use conduwuit_service::Services;
+use conduwuit_social_service::Services;
 use futures::{FutureExt, Stream, StreamExt, TryStreamExt};
 use ruma::events::room::message::RoomMessageEventContent;
 use tokio::time::Instant;

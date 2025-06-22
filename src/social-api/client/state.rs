@@ -4,7 +4,7 @@ use conduwuit::{
 	matrix::pdu::{PduBuilder, PduEvent},
 	utils::BoolExt,
 };
-use conduwuit_service::Services;
+use conduwuit_social_service::Services;
 use futures::TryStreamExt;
 use ruma::{
 	OwnedEventId, RoomId, UserId,

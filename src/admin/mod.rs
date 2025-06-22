@@ -21,7 +21,7 @@ pub(crate) mod user;
 
 extern crate conduwuit_social_api as api;
 extern crate conduwuit_core as conduwuit;
-extern crate conduwuit_service as service;
+extern crate conduwuit_social_service as service;
 
 pub(crate) use conduwuit::Result;
 pub(crate) use conduwuit_macros::{admin_command, admin_command_dispatch};

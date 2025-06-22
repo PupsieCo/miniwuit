@@ -4,7 +4,7 @@ use conduwuit::{
 	matrix::pdu::PduCount,
 	utils::{IterStream, ReadyExt, result::FlatOk, stream::WidebandExt},
 };
-use conduwuit_service::{Services, rooms::timeline::PdusIterItem};
+use conduwuit_social_service::{Services, rooms::timeline::PdusIterItem};
 use futures::StreamExt;
 use ruma::{
 	EventId, RoomId, UInt, UserId,

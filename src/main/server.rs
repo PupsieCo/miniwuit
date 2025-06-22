@@ -16,7 +16,7 @@ pub(crate) struct Server {
 	/// Server runtime state; public portion
 	pub(crate) server: Arc<conduwuit_core::Server>,
 
-	pub(crate) services: Mutex<Option<Arc<conduwuit_service::Services>>>,
+	pub(crate) services: Mutex<Option<Arc<conduwuit_social_service::Services>>>,
 
 	_tracing_flame_guard: TracingFlameGuard,
 

@@ -8,7 +8,7 @@ use conduwuit::{
 	Err, Result,
 	utils::{future::TryExtExt, stream::IterStream},
 };
-use conduwuit_service::{
+use conduwuit_social_service::{
 	Services,
 	rooms::spaces::{
 		PaginationToken, SummaryAccessibility, get_parent_children_via, summary_to_chunk,

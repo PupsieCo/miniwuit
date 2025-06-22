@@ -3,7 +3,7 @@ use conduwuit::{
 	Err, Result,
 	utils::stream::{BroadbandExt, IterStream},
 };
-use conduwuit_service::rooms::spaces::{
+use conduwuit_social_service::rooms::spaces::{
 	Identifier, SummaryAccessibility, get_parent_children_via,
 };
 use futures::{FutureExt, StreamExt};

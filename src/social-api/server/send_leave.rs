@@ -2,7 +2,7 @@
 
 use axum::extract::State;
 use conduwuit::{Err, Result, err, matrix::pdu::gen_event_id_canonical_json};
-use conduwuit_service::Services;
+use conduwuit_social_service::Services;
 use futures::FutureExt;
 use ruma::{
 	OwnedRoomId, OwnedUserId, RoomId, ServerName,

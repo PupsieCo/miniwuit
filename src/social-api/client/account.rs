@@ -9,7 +9,7 @@ use conduwuit::{
 	utils::{ReadyExt, stream::BroadbandExt},
 	warn,
 };
-use conduwuit_service::Services;
+use conduwuit_social_service::Services;
 use futures::{FutureExt, StreamExt};
 use register::RegistrationKind;
 use ruma::{

@@ -6,7 +6,7 @@ use conduwuit::{
 	Err, Result, err,
 	utils::{content_disposition::make_content_disposition, math::ruma_from_usize},
 };
-use conduwuit_service::media::{CACHE_CONTROL_IMMUTABLE, CORP_CROSS_ORIGIN, Dim, FileMeta};
+use conduwuit_social_service::media::{CACHE_CONTROL_IMMUTABLE, CORP_CROSS_ORIGIN, Dim, FileMeta};
 use reqwest::Url;
 use ruma::{
 	Mxc,

@@ -18,7 +18,7 @@ use conduwuit::{
 	},
 	warn,
 };
-use conduwuit_service::rooms::read_receipt::pack_receipts;
+use conduwuit_social_service::rooms::read_receipt::pack_receipts;
 use futures::{FutureExt, StreamExt, TryFutureExt};
 use ruma::{
 	DeviceId, OwnedEventId, OwnedRoomId, RoomId, UInt, UserId,

@@ -20,7 +20,7 @@ use conduwuit::{
 	utils::{self, IterStream, ReadyExt, shuffle},
 	warn,
 };
-use conduwuit_service::{
+use conduwuit_social_service::{
 	Services,
 	appservice::RegistrationInfo,
 	rooms::{

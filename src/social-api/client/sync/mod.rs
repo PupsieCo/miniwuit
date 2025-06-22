@@ -10,7 +10,7 @@ use conduwuit::{
 		stream::{BroadbandExt, ReadyExt, TryIgnore},
 	},
 };
-use conduwuit_service::Services;
+use conduwuit_social_service::Services;
 use futures::{StreamExt, pin_mut};
 use ruma::{
 	RoomId, UserId,

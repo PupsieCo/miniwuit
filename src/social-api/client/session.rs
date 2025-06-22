@@ -6,7 +6,7 @@ use conduwuit::{
 	Err, Error, Result, debug, err, info, utils,
 	utils::{ReadyExt, hash},
 };
-use conduwuit_service::uiaa::SESSION_ID_LENGTH;
+use conduwuit_social_service::uiaa::SESSION_ID_LENGTH;
 use futures::StreamExt;
 use ruma::{
 	UserId,

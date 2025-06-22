@@ -1,5 +1,5 @@
 use conduwuit::{Err, Result, implement, is_false};
-use conduwuit_service::Services;
+use conduwuit_social_service::Services;
 use futures::{FutureExt, StreamExt, future::OptionFuture, join};
 use ruma::{EventId, RoomId, ServerName};
 

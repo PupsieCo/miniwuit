@@ -2,7 +2,7 @@ use std::collections::{BTreeMap, HashMap, HashSet};
 
 use axum::extract::State;
 use conduwuit::{Err, Error, Result, debug, debug_warn, err, result::NotFound, utils};
-use conduwuit_service::{Services, users::parse_master_key};
+use conduwuit_social_service::{Services, users::parse_master_key};
 use futures::{StreamExt, stream::FuturesUnordered};
 use ruma::{
 	OneTimeKeyAlgorithm, OwnedDeviceId, OwnedUserId, UserId,

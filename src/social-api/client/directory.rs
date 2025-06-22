@@ -9,7 +9,7 @@ use conduwuit::{
 		stream::{ReadyExt, WidebandExt},
 	},
 };
-use conduwuit_service::Services;
+use conduwuit_social_service::Services;
 use futures::{
 	FutureExt, StreamExt, TryFutureExt,
 	future::{join, join4, join5},

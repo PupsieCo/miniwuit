@@ -7,7 +7,7 @@ use conduwuit::{
 	utils::{IterStream, stream::TryIgnore},
 	warn,
 };
-use conduwuit_service::Services;
+use conduwuit_social_service::Services;
 use futures::{StreamExt, TryStreamExt, future::join3};
 use ruma::{
 	OwnedMxcUri, OwnedRoomId, UserId,

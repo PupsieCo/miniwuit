@@ -611,9 +611,9 @@ package = "conduwuit_social_api"
 path = "src/social-api"
 default-features = false
 
-[workspace.dependencies.conduwuit-service]
-package = "conduwuit_service"
-path = "src/service"
+[workspace.dependencies.conduwuit-social-service]
+package = "conduwuit_social_service"
+path = "src/social-service"
 default-features = false
 
 [workspace.dependencies.conduwuit-database]

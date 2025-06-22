@@ -9,7 +9,7 @@ use conduwuit::{
 		stream::{BroadbandExt, ReadyExt, TryIgnore, WidebandExt},
 	},
 };
-use conduwuit_service::rooms::{lazy_loading, lazy_loading::Options, short::ShortStateKey};
+use conduwuit_social_service::rooms::{lazy_loading, lazy_loading::Options, short::ShortStateKey};
 use futures::{
 	FutureExt, StreamExt, TryFutureExt, TryStreamExt,
 	future::{OptionFuture, join, join3, try_join3},

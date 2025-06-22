@@ -6,7 +6,7 @@ use conduwuit::{
 	Err, Result, err,
 	utils::{self, content_disposition::make_content_disposition, math::ruma_from_usize},
 };
-use conduwuit_service::{
+use conduwuit_social_service::{
 	Services,
 	media::{CACHE_CONTROL_IMMUTABLE, CORP_CROSS_ORIGIN, Dim, FileMeta, MXC_LENGTH},
 };

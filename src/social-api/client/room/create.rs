@@ -6,7 +6,7 @@ use conduwuit::{
 	matrix::{StateKey, pdu::PduBuilder},
 	warn,
 };
-use conduwuit_service::{Services, appservice::RegistrationInfo};
+use conduwuit_social_service::{Services, appservice::RegistrationInfo};
 use futures::FutureExt;
 use ruma::{
 	CanonicalJsonObject, Int, OwnedRoomAliasId, OwnedRoomId, OwnedUserId, RoomId, RoomVersionId,

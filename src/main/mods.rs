@@ -1,7 +1,7 @@
 #![cfg(all(conduwuit_mods, feature = "conduwuit_mods"))]
 
 #[unsafe(no_link)]
-extern crate conduwuit_service;
+extern crate conduwuit_social_service;
 
 use std::{
 	future::Future,
@@ -10,7 +10,7 @@ use std::{
 };
 
 use conduwuit_core::{Error, Result, debug, error, mods};
-use conduwuit_service::Services;
+use conduwuit_social_service::Services;
 
 use crate::Server;
 
@@ -23,11 +23,11 @@ type RunFuncProto = fn(&Arc<Services>) -> RunFuncResult;
 type StopFuncResult = Pin<Box<dyn Future<Output = Result<()>> + Send>>;
 type StopFuncProto = fn(Arc<Services>) -> StopFuncResult;
 
-const RESTART_THRESH: &str = "conduwuit_service";
+const RESTART_THRESH: &str = "conduwuit_social_service";
 const MODULE_NAMES: &[&str] = &[
 	//"conduwuit_core",
 	"conduwuit_database",
-	"conduwuit_service",
+	"conduwuit_social_service",
 	"conduwuit_social_api",
 	"conduwuit_admin",
 	"conduwuit_router",

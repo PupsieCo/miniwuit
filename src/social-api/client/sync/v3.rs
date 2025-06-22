@@ -21,7 +21,7 @@ use conduwuit::{
 	},
 	warn,
 };
-use conduwuit_service::{
+use conduwuit_social_service::{
 	Services,
 	rooms::{
 		lazy_loading,

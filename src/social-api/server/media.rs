@@ -1,7 +1,7 @@
 use axum::extract::State;
 use axum_client_ip::InsecureClientIp;
 use conduwuit::{Err, Result, utils::content_disposition::make_content_disposition};
-use conduwuit_service::media::{Dim, FileMeta};
+use conduwuit_social_service::media::{Dim, FileMeta};
 use ruma::{
 	Mxc,
 	api::federation::authenticated_media::{

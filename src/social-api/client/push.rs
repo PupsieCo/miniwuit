@@ -1,6 +1,6 @@
 use axum::extract::State;
 use conduwuit::{Err, Error, Result, err};
-use conduwuit_service::Services;
+use conduwuit_social_service::Services;
 use ruma::{
 	CanonicalJsonObject, CanonicalJsonValue,
 	api::client::{

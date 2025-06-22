@@ -11,7 +11,7 @@ use conduwuit::{
 		stream::{BroadbandExt, TryIgnore, WidebandExt},
 	},
 };
-use conduwuit_service::{
+use conduwuit_social_service::{
 	Services,
 	rooms::{
 		lazy_loading,

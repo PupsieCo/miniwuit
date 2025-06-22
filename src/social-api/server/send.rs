@@ -14,7 +14,7 @@ use conduwuit::{
 	},
 	warn,
 };
-use conduwuit_service::{
+use conduwuit_social_service::{
 	Services,
 	sending::{EDU_LIMIT, PDU_LIMIT},
 };

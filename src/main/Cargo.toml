@@ -50,28 +50,28 @@ default = [
 ]
 
 blurhashing = [
-	"conduwuit-service/blurhashing",
+	"conduwuit-social-service/blurhashing",
 ]
 brotli_compression = [
 	"conduwuit-social-api/brotli_compression",
 	"conduwuit-core/brotli_compression",
 	"conduwuit-router/brotli_compression",
-	"conduwuit-service/brotli_compression",
+	"conduwuit-social-service/brotli_compression",
 ]
 console = [
-	"conduwuit-service/console",
+	"conduwuit-social-service/console",
 ]
 direct_tls = [
     "conduwuit-router/direct_tls"
 ]
 element_hacks = [
 	"conduwuit-social-api/element_hacks",
-	"conduwuit-service/element_hacks",
+	"conduwuit-social-service/element_hacks",
 ]
 gzip_compression = [
 	"conduwuit-social-api/gzip_compression",
 	"conduwuit-router/gzip_compression",
-	"conduwuit-service/gzip_compression",
+	"conduwuit-social-service/gzip_compression",
 ]
 hardened_malloc = [
 	"conduwuit-core/hardened_malloc",
@@ -93,7 +93,7 @@ jemalloc_conf = [
 	"conduwuit-core/jemalloc_conf",
 ]
 media_thumbnail = [
-	"conduwuit-service/media_thumbnail",
+	"conduwuit-social-service/media_thumbnail",
 ]
 perf_measurements = [
 	"dep:opentelemetry",
@@ -116,7 +116,7 @@ release_max_log_level = [
 	"conduwuit-core/release_max_log_level",
 	"conduwuit-database/release_max_log_level",
 	"conduwuit-router/release_max_log_level",
-	"conduwuit-service/release_max_log_level",
+	"conduwuit-social-service/release_max_log_level",
 ]
 sentry_telemetry = [
 	"dep:sentry",
@@ -134,7 +134,7 @@ tokio_console = [
 	"tokio/tracing",
 ]
 url_preview = [
-	"conduwuit-service/url_preview",
+	"conduwuit-social-service/url_preview",
 ]
 zstd_compression = [
     "conduwuit-social-api/zstd_compression",
@@ -152,7 +152,7 @@ conduwuit-social-api.workspace = true
 conduwuit-core.workspace = true
 conduwuit-database.workspace = true
 conduwuit-router.workspace = true
-conduwuit-service.workspace = true
+conduwuit-social-service.workspace = true
 
 clap.workspace = true
 console-subscriber.optional = true

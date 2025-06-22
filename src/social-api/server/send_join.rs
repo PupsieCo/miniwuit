@@ -9,7 +9,7 @@ use conduwuit::{
 	utils::stream::{IterStream, TryBroadbandExt},
 	warn,
 };
-use conduwuit_service::Services;
+use conduwuit_social_service::Services;
 use futures::{FutureExt, StreamExt, TryStreamExt};
 use ruma::{
 	CanonicalJsonValue, OwnedEventId, OwnedRoomId, OwnedServerName, OwnedUserId, RoomId,

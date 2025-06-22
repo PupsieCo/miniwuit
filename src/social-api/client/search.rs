@@ -7,7 +7,7 @@ use conduwuit::{
 	result::FlatOk,
 	utils::{IterStream, stream::ReadyExt},
 };
-use conduwuit_service::{Services, rooms::search::RoomQuery};
+use conduwuit_social_service::{Services, rooms::search::RoomQuery};
 use futures::{FutureExt, StreamExt, TryFutureExt, TryStreamExt, future::OptionFuture};
 use ruma::{
 	OwnedRoomId, RoomId, UInt, UserId,

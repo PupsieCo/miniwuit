@@ -1,6 +1,6 @@
 use axum::extract::State;
 use conduwuit::{Err, Result, debug};
-use conduwuit_service::Services;
+use conduwuit_social_service::Services;
 use futures::StreamExt;
 use rand::seq::SliceRandom;
 use ruma::{

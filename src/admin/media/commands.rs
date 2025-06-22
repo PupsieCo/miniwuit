@@ -3,7 +3,7 @@ use std::time::Duration;
 use conduwuit::{
 	Result, debug, debug_info, debug_warn, error, info, trace, utils::time::parse_timepoint_ago,
 };
-use conduwuit_service::media::Dim;
+use conduwuit_social_service::media::Dim;
 use ruma::{
 	EventId, Mxc, MxcUri, OwnedMxcUri, OwnedServerName, ServerName,
 	events::room::message::RoomMessageEventContent,

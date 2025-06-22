@@ -2,7 +2,7 @@ use axum::extract::State;
 use conduwuit::{
 	Err, Error, Result, debug_info, matrix::pdu::PduBuilder, utils::IterStream, warn,
 };
-use conduwuit_service::Services;
+use conduwuit_social_service::Services;
 use futures::StreamExt;
 use ruma::{
 	CanonicalJsonObject, OwnedUserId, RoomId, RoomVersionId, UserId,
