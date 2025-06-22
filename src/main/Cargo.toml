@@ -111,7 +111,7 @@ release_max_log_level = [
 	"tracing/release_max_level_info",
 	"log/max_level_trace",
 	"log/release_max_level_info",
-	"conduwuit-admin/release_max_log_level",
+	"conduwuit-social-admin/release_max_log_level",
 	"conduwuit-social-api/release_max_log_level",
 	"conduwuit-core/release_max_log_level",
 	"conduwuit-database/release_max_log_level",
@@ -147,7 +147,7 @@ conduwuit_mods = [
 ]
 
 [dependencies]
-conduwuit-admin.workspace = true
+conduwuit-social-admin.workspace = true
 conduwuit-social-api.workspace = true
 conduwuit-core.workspace = true
 conduwuit-database.workspace = true

@@ -601,9 +601,9 @@ package = "conduwuit_router"
 path = "src/router"
 default-features = false
 
-[workspace.dependencies.conduwuit-admin]
-package = "conduwuit_admin"
-path = "src/admin"
+[workspace.dependencies.conduwuit-social-admin]
+package = "conduwuit_social_admin"
+path = "src/social-admin"
 default-features = false
 
 [workspace.dependencies.conduwuit-social-api]

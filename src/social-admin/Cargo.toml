@@ -1,5 +1,5 @@
 [package]
-name = "conduwuit_admin"
+name = "conduwuit_social_admin"
 categories.workspace = true
 description.workspace = true
 edition.workspace = true

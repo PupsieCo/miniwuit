@@ -1,4 +1,4 @@
-extern crate conduwuit_admin as admin;
+extern crate conduwuit_social_admin as admin;
 extern crate conduwuit_core as conduwuit;
 extern crate conduwuit_social_service as service;
 

@@ -1187,10 +1187,10 @@ name = "conduwuit"
 version = "0.5.0"
 dependencies = [
  "clap",
- "conduwuit_admin",
  "conduwuit_core",
  "conduwuit_database",
  "conduwuit_router",
+ "conduwuit_social_admin",
  "conduwuit_social_api",
  "conduwuit_social_service",
  "console-subscriber",
@@ -1208,27 +1208,6 @@ dependencies = [
  "tracing",
  "tracing-flame",
  "tracing-opentelemetry",
- "tracing-subscriber",
-]
-
-[[package]]
-name = "conduwuit_admin"
-version = "0.5.0"
-dependencies = [
- "clap",
- "conduwuit_core",
- "conduwuit_database",
- "conduwuit_macros",
- "conduwuit_social_api",
- "conduwuit_social_service",
- "const-str",
- "futures",
- "log",
- "ruma",
- "serde_json",
- "serde_yaml",
- "tokio",
- "tracing",
  "tracing-subscriber",
 ]
 
@@ -1327,8 +1306,8 @@ dependencies = [
  "axum-server",
  "axum-server-dual-protocol",
  "bytes",
- "conduwuit_admin",
  "conduwuit_core",
+ "conduwuit_social_admin",
  "conduwuit_social_api",
  "conduwuit_social_service",
  "const-str",
@@ -1349,6 +1328,27 @@ dependencies = [
  "tower 0.5.2",
  "tower-http",
  "tracing",
+]
+
+[[package]]
+name = "conduwuit_social_admin"
+version = "0.5.0"
+dependencies = [
+ "clap",
+ "conduwuit_core",
+ "conduwuit_database",
+ "conduwuit_macros",
+ "conduwuit_social_api",
+ "conduwuit_social_service",
+ "const-str",
+ "futures",
+ "log",
+ "ruma",
+ "serde_json",
+ "serde_yaml",
+ "tokio",
+ "tracing",
+ "tracing-subscriber",
 ]
 
 [[package]]
