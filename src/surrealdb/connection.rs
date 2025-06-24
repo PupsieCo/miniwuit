@@ -37,7 +37,7 @@ pub struct SurrealConnection {
 
 /// Connection factory for creating and managing SurrealDB connections
 pub struct ConnectionFactory {
-    config: SurrealConnectionConfig,
+    config: SurrealConfig,
     next_id: AtomicU64,
 }
 
@@ -71,24 +71,24 @@ impl SurrealConnection {
         let db: Surreal<Any> = match &config.connection {
             SurrealConnectionConfig::Memory => {
                 debug!("Establishing SurrealDB memory connection");
-                Surreal::new::<Mem>(()).await
-                    .map_err(|e| Error::Connection(format!("Failed to create memory connection: {e}")))?
+                Surreal::new::<Mem>(()).await?
+                    .map_err(|e| Error::Connection(format!("Failed to create memory connection: {e}")))
             }
             SurrealConnectionConfig::File { path } => {
                 debug!("Establishing SurrealDB file connection to: {}", path.display());
-                Surreal::new::<File>(format!("file://{}", path.display())).await
-                    .map_err(|e| Error::Connection(format!("Failed to create file connection: {e}")))?
+                Surreal::new::<File>(format!("file://{}", path.display())).await?
+                    .map_err(|e| Error::Connection(format!("Failed to create file connection: {e}")))
             }
             SurrealConnectionConfig::RocksDb { path } => {
                 debug!("Establishing SurrealDB RocksDB connection to: {}", path.display());
-                Surreal::new::<RocksDb>(format!("rocksdb://{}", path.display())).await
-                    .map_err(|e| Error::Connection(format!("Failed to create RocksDB connection: {e}")))?
+                Surreal::new::<RocksDb>(format!("rocksdb://{}", path.display())).await?
+                    .map_err(|e| Error::Connection(format!("Failed to create RocksDB connection: {e}")))
             }
             SurrealConnectionConfig::Remote { url } => {
                 debug!("Establishing SurrealDB remote connection to: {}", url);
                 // This can default to a WebSocket connection for remote connections
-                Surreal::new::<Ws>(url.as_str()).await
-                    .map_err(|e| Error::Connection(format!("Failed to create remote connection: {e}")))?
+                Surreal::new::<Ws>(url.as_str()).await?
+                    .map_err(|e| Error::Connection(format!("Failed to create remote connection: {e}")))
             }
         };
         
@@ -127,7 +127,7 @@ impl SurrealConnection {
     }
     
     /// Configure SurrealDB capabilities
-    async fn configure_capabilities(db: &Surreal<Any>, config: &SurrealConnectionConfig) -> Result<()> {
+    async fn configure_capabilities(db: &Surreal<Any>, config: &SurrealConfig) -> Result<()> {
         // Set capabilities based on configuration
         let capabilities = &config.capabilities;
         
@@ -244,7 +244,7 @@ impl SurrealConnection {
     /// Get connection statistics
     pub async fn stats(&self) -> SurrealConnectionStats {
         SurrealConnectionStats {
-            connection_id: self.connection_id,
+            connection_id: 0, //self.connection_id,
             last_used: *self.last_used.read().await,
             is_healthy: self.is_healthy(),
             query_count: self.query_count.load(Ordering::Relaxed),
@@ -276,7 +276,7 @@ impl SurrealConnection {
 }
 
 impl ConnectionFactory {
-    pub fn new(config: SurrealConnectionConfig) -> Self {
+    pub fn new(config: SurrealConfig) -> Self {
         Self {
             config,
             next_id: AtomicU64::new(1),
@@ -285,13 +285,14 @@ impl ConnectionFactory {
     
     /// Create a new connection
     pub async fn create_connection(&self) -> Result<SurrealConnection> {
-        let id = self.next_id.fetch_add(1, Ordering::Relaxed);
-        SurrealConnection::new(self.config.clone(), id).await
+        // let id = self.next_id.fetch_add(1, Ordering::Relaxed);
+        // remove the id for now
+        SurrealConnection::new(self.config.clone()).await
             .map_err(|e| e.into())
     }
     
     /// Get the configuration
-    pub fn config(&self) -> &SurrealConnectionConfig {
+    pub fn config(&self) -> &SurrealConfig {
         &self.config
     }
 }
