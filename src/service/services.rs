@@ -10,11 +10,10 @@ use futures::{Stream, StreamExt, TryStreamExt};
 use tokio::sync::Mutex;
 
 use crate::{
-	account_data, admin, appservice, client, config, emergency, federation, globals, key_backups,
+	config,
 	manager::Manager,
-	media, presence, pusher, resolver, rooms, sending, server_keys, service,
-	service::{Args, Map, Service},
-	sync, transaction_ids, uiaa, updates, users,
+	service,
+	service::{Args, Map, Service}
 };
 
 pub struct Services {
@@ -54,8 +53,8 @@ impl Services {
 	pub async fn start(self: &Arc<Self>) -> Result<Arc<Self>> {
 		debug_info!("Starting services...");
 
-		self.admin.set_services(Some(Arc::clone(self)).as_ref());
-		super::migrations::migrations(self).await?;
+		// self.admin.set_services(Some(Arc::clone(self)).as_ref());
+		// super::migrations::migrations(self).await?;
 		self.manager
 			.lock()
 			.await
@@ -66,13 +65,13 @@ impl Services {
 
 		// reset dormant online/away statuses to offline, and set the server user as
 		// online
-		if self.server.config.allow_local_presence && !self.db.is_read_only() {
-			self.presence.unset_all_presence().await;
-			_ = self
-				.presence
-				.ping_presence(&self.globals.server_user, &ruma::presence::PresenceState::Online)
-				.await;
-		}
+		// if self.server.config.allow_local_presence && !self.db.is_read_only() {
+		// 	self.presence.unset_all_presence().await;
+		// 	_ = self
+		// 		.presence
+		// 		.ping_presence(&self.globals.server_user, &ruma::presence::PresenceState::Online)
+		// 		.await;
+		// }
 
 		debug_info!("Services startup complete.");
 		Ok(Arc::clone(self))
@@ -82,19 +81,19 @@ impl Services {
 		info!("Shutting down services...");
 
 		// set the server user as offline
-		if self.server.config.allow_local_presence && !self.db.is_read_only() {
-			_ = self
-				.presence
-				.ping_presence(&self.globals.server_user, &ruma::presence::PresenceState::Offline)
-				.await;
-		}
+		// if self.server.config.allow_local_presence && !self.db.is_read_only() {
+		// 	_ = self
+		// 		.presence
+		// 		.ping_presence(&self.globals.server_user, &ruma::presence::PresenceState::Offline)
+		// 		.await;
+		// }
 
 		self.interrupt();
 		if let Some(manager) = self.manager.lock().await.as_ref() {
 			manager.stop().await;
 		}
 
-		self.admin.set_services(None);
+		// self.admin.set_services(None);
 
 		debug_info!("Services shutdown complete.");
 	}

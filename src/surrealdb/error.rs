@@ -88,11 +88,11 @@ impl From<tokio::time::error::Elapsed> for Error {
     }
 }
 
-impl From<async_channel::SendError<crate::pool::PooledConnection>> for Error {
-    fn from(e: async_channel::SendError<crate::pool::PooledConnection>) -> Self {
-        Error::Pool(format!("Failed to return connection to pool: {e}"))
-    }
-}
+// impl From<async_channel::SendError<crate::pool::PooledConnection>> for Error {
+//     fn from(e: async_channel::SendError<crate::pool::PooledConnection>) -> Self {
+//         Error::Pool(format!("Failed to return connection to pool: {e}"))
+//     }
+// }
 
 impl From<async_channel::RecvError> for Error {
     fn from(e: async_channel::RecvError) -> Self {
@@ -184,12 +184,8 @@ impl From<conduwuit::Error> for Error {
     }
 }
 
-/// Convert SurrealDB error to conduwuit Error
-impl From<surrealdb::Error> for conduwuit::Error {
-    fn from(e: surrealdb::Error) -> Self {
-        conduwuit::err!("SurrealDB error: {e}")
-    }
-}
+// Note: Cannot implement From<surrealdb::Error> for conduwuit::Error due to orphan rules
+// Use explicit conversion functions instead
 
 /// Universal error conversion helper for SurrealDB operations
 pub fn convert_surreal_error<T>(result: std::result::Result<T, surrealdb::Error>) -> Result<T> {

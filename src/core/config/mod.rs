@@ -1,6 +1,7 @@
 pub mod check;
 pub mod manager;
 pub mod proxy;
+pub mod surrealdb;
 
 use std::{
 	collections::{BTreeMap, BTreeSet},
@@ -23,7 +24,10 @@ use ruma::{
 use serde::{Deserialize, de::IgnoredAny};
 use url::Url;
 
-use self::proxy::ProxyConfig;
+pub use self::{
+	proxy::ProxyConfig, 
+	surrealdb::SurrealConfig
+};
 pub use self::{check::check, manager::Manager};
 use crate::{Result, err, error::Error, utils::sys};
 
@@ -1813,6 +1817,42 @@ pub struct Config {
 	pub allow_invalid_tls_certificates_yes_i_know_what_the_fuck_i_am_doing_with_this_and_i_know_this_is_insecure:
 		bool,
 
+
+	#[cfg(not(doctest))]
+	/// Examples:
+	///
+	/// - No surrealdb (default):
+	///
+	///       [surrealdb]
+	///       namespace = "conduwuit"
+	///       database = "main"
+	///
+	/// - For global surrealdb, create the section at the bottom of this file:
+	///
+	///       [surrealdb]
+	///       namespace = "conduwuit"
+	///       database = "main"
+	///
+	///       [surrealdb.connection]
+	///       mode = "file"
+	///       path = "/var/lib/conduwuit/surreal.db"
+	///
+	///       [surrealdb.auth]
+	///       username = "root"
+	///       password = "secure_password"
+	///
+	///       [surrealdb.pool]
+	///       max_connections = 10
+	///       connection_timeout = 30
+	///       idle_timeout = 300
+	///
+	///       [surrealdb.capabilities]
+	///       allow_functions = true
+	///       allow_network = false
+	///
+	/// default: "none"
+	#[serde(default)]
+	pub surrealdb: SurrealConfig,
 	// external structure; separate section
 	#[serde(default)]
 	pub blurhashing: BlurhashConfig,

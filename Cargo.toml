@@ -621,6 +621,11 @@ package = "conduwuit_database"
 path = "src/database"
 default-features = false
 
+[workspace.dependencies.conduwuit-surrealdb]
+package = "conduwuit_surrealdb"
+path = "src/surrealdb"
+default-features = false
+
 [workspace.dependencies.conduwuit-core]
 package = "conduwuit_core"
 path = "src/core"

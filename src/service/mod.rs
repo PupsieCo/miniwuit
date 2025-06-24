@@ -2,7 +2,6 @@
 #![allow(refining_impl_trait)]
 
 mod manager;
-mod migrations;
 mod service;
 pub mod services;
 pub mod config;

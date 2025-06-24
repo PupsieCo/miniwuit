@@ -64,7 +64,7 @@ impl QueryBuilder {
     }
     
     /// Create a table with schema
-    pub async fn create_table(&self, schema: &TableSchema) -> SurrealResult<Vec<Response>> {
+    pub async fn create_table(&self, schema: &TableSchema) -> SurrealResult<Response> {
         debug!("Creating table: {}", schema.name);
         
         let mut queries = Vec::new();
@@ -154,7 +154,7 @@ impl QueryBuilder {
     }
     
     /// Drop a table
-    pub async fn drop_table(&self, table_name: &str) -> SurrealResult<Vec<Response>> {
+    pub async fn drop_table(&self, table_name: &str) -> SurrealResult<Response> {
         debug!("Dropping table: {}", table_name);
         
         let query = format!("REMOVE TABLE {};", table_name);
@@ -248,7 +248,7 @@ impl QueryBuilder {
     }
     
     /// Execute a custom query with parameters
-    pub async fn execute_query(&self, query: &str, params: Option<HashMap<String, Value>>) -> SurrealResult<Vec<Response>> {
+    pub async fn execute_query(&self, query: &str, params: Option<HashMap<String, Value>>) -> SurrealResult<Response> {
         trace!("Executing custom query: {}", query);
         
         let mut query_builder = self.engine.db.query(query);
@@ -260,7 +260,6 @@ impl QueryBuilder {
         }
         
         query_builder.await
-            .map(|response| vec![response])
             .map_err(Error::from)
     }
     

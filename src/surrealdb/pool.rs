@@ -19,6 +19,7 @@ pub struct ConnectionPool {
 pub struct PooledConnection {
     pub db: Surreal<Any>,
     pub last_used: std::time::Instant,
+    pub config: SurrealConfig,
 }
 
 impl PooledConnection {
@@ -45,7 +46,7 @@ impl ConnectionPool {
         // Pre-fill pool with connections
         pool.initialize_connections(&config).await?;
         
-        Ok(pool)
+        Ok(pool.clone())
     }
     
     pub async fn get_connection(&self) -> SurrealResult<PooledConnection> {

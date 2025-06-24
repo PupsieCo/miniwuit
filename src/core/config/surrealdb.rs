@@ -6,7 +6,7 @@ use std::path::PathBuf;
 pub struct SurrealConfig {
     /// Connection mode: "memory", "file", "tikv", "foundationdb", or remote URL
     #[serde(default = "default_connection")]
-    pub connection: SurrealConnection,
+    pub connection: SurrealConnectionConfig,
     
     /// Database namespace
     pub namespace: String,
@@ -41,12 +41,11 @@ pub struct SurrealConfig {
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(tag = "mode")]
-pub enum SurrealConnection {
+pub enum SurrealConnectionConfig {
     Memory,
     File { path: PathBuf },
-    Remote { url: Url },
-    TiKV { endpoints: Vec<String> },
-    FoundationDB { cluster_file: Option<PathBuf> },
+    RocksDb { path: PathBuf },
+    Remote { url: Url }
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -85,8 +84,8 @@ pub struct SurrealCapabilities {
 }
 
 // Default value functions
-fn default_connection() -> SurrealConnection {
-    SurrealConnection::Memory
+fn default_connection() -> SurrealConnectionConfig {
+    SurrealConnectionConfig::Memory
 }
 
 fn default_query_timeout() -> u64 {
