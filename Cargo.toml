@@ -402,7 +402,7 @@ features = [
 [workspace.dependencies.surrealdb]
 git = "ssh://git@gitlab.com/pupsieco/surrealdb.git"
 rev = "4fc22e49094e653f4a0603ae413b301ee0c75b28"
-features = ["kv-rocksdb"]
+features = ["kv-mem", "kv-rocksdb", "kv-surrealkv", "kv-tikv", "kv-fdb", "protocol-ws"]
 
 [workspace.dependencies.sha2]
 version = "0.10.8"
