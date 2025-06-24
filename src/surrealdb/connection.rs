@@ -25,7 +25,7 @@ use conduwuit_core::config::surrealdb::{
 
 /// A managed SurrealDB connection with health checking and automatic reconnection
 pub struct SurrealConnection {
-	pub(crate) db: RwLock<Surreal<Db>>,
+	pub(crate) db: RwLock<Surreal<Any>>,
 	pub(crate) config: SurrealConfig,
 	pub(crate) last_used: Arc<RwLock<Instant>>,
 	pub(crate) is_healthy: AtomicBool,
@@ -68,35 +68,36 @@ impl SurrealConnection {
 
 	/// Establish the actual SurrealDB connection based on configuration
 	async fn establish_connection(config: &SurrealConfig) -> SurrealResult<Surreal<Any>> {
-		let db: Surreal<Any> = match &config.connection {
+		let db = Surreal::<Any>::init();
+		match &config.connection {
 			| SurrealConnectionConfig::Memory => {
 				debug!("Establishing SurrealDB memory connection");
-				Surreal::new::<Mem>(()).await?.map_err(|e| {
+				db.connect("mem://").await.map_err(|e| {
 					Error::Connection(format!("Failed to create memory connection: {e}"))
-				})
+				})?
 			},
 			| SurrealConnectionConfig::File { path } => {
 				debug!("Establishing SurrealDB file connection to: {}", path.display());
-				Surreal::new::<File>(format!("file://{}", path.display()))
-					.await?
+				db.connect(format!("file://{}", path.display()))
+					.await
 					.map_err(|e| {
 						Error::Connection(format!("Failed to create file connection: {e}"))
-					})
+					})?
 			},
 			| SurrealConnectionConfig::RocksDb { path } => {
 				debug!("Establishing SurrealDB RocksDB connection to: {}", path.display());
-				Surreal::new::<RocksDb>(format!("rocksdb://{}", path.display()))
-					.await?
+				db.connect(format!("rocksdb://{}", path.display()))
+					.await
 					.map_err(|e| {
 						Error::Connection(format!("Failed to create RocksDB connection: {e}"))
-					})
+					})?
 			},
 			| SurrealConnectionConfig::Remote { url } => {
 				debug!("Establishing SurrealDB remote connection to: {}", url);
 				// This can default to a WebSocket connection for remote connections
-				Surreal::new::<Ws>(url.as_str()).await?.map_err(|e| {
+				db.connect(url.as_str()).await.map_err(|e| {
 					Error::Connection(format!("Failed to create remote connection: {e}"))
-				})
+				})?
 			},
 		};
 
@@ -136,7 +137,10 @@ impl SurrealConnection {
 	}
 
 	/// Configure SurrealDB capabilities
-	async fn configure_capabilities(db: &Surreal<Any>, config: &SurrealConfig) -> SurrealResult<()> {
+	async fn configure_capabilities(
+		db: &Surreal<Any>,
+		config: &SurrealConfig,
+	) -> SurrealResult<()> {
 		// Set capabilities based on configuration
 		let capabilities = &config.capabilities;
 
@@ -209,7 +213,7 @@ impl SurrealConnection {
 
 		match tokio::time::timeout(
 			Duration::from_secs(self.config.transaction_timeout),
-			f(&self.db.read().await),
+			f(&*self.db.read().await),
 		)
 		.await
 		{
@@ -237,7 +241,7 @@ impl SurrealConnection {
 	pub async fn health_check(&self) -> SurrealResult<()> {
 		trace!(connection_id = self.connection_id, "Performing health check");
 
-		match tokio::time::timeout(Duration::from_secs(5), self.db.health()).await {
+		match tokio::time::timeout(Duration::from_secs(5), self.db.read().await.health()).await {
 			| Ok(Ok(_)) => {
 				self.is_healthy.store(true, Ordering::Relaxed);
 				Ok(())
@@ -280,7 +284,7 @@ impl SurrealConnection {
 	}
 
 	/// Reconnect the connection
-	pub async fn reconnect(&mut self) -> SurrealResult<()> {
+	pub async fn reconnect(&self) -> SurrealResult<()> {
 		warn!(connection_id = self.connection_id, "Reconnecting SurrealDB connection");
 
 		*self.db.write().await = Self::establish_connection(&self.config).await?;
