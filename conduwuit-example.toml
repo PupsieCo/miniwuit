@@ -1572,6 +1572,39 @@
 #
 #config_reload_signal = true
 
+# Examples:
+#
+# - No surrealdb (default):
+#
+#       [surrealdb]
+#       namespace = "conduwuit"
+#       database = "main"
+#
+# - For global surrealdb, create the section at the bottom of this file:
+#
+#       [surrealdb]
+#       namespace = "conduwuit"
+#       database = "main"
+#
+#       [surrealdb.connection]
+#       mode = "file"
+#       path = "/var/lib/conduwuit/surreal.db"
+#
+#       [surrealdb.auth]
+#       username = "root"
+#       password = "secure_password"
+#
+#       [surrealdb.pool]
+#       max_connections = 10
+#       connection_timeout = 30
+#       idle_timeout = 300
+#
+#       [surrealdb.capabilities]
+#       allow_functions = true
+#       allow_network = false
+#
+#surrealdb = "none"
+
 [global.tls]
 
 # Path to a valid TLS certificate file.

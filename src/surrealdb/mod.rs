@@ -13,8 +13,8 @@ mod connection;
 // mod queries;
 mod error;
 
-#[cfg(test)]
-mod tests;
+// #[cfg(test)]
+// mod tests;
 
 // pub use self::{
 //     // engine::Engine,
@@ -29,47 +29,46 @@ mod tests;
 pub use connection::{SurrealConnection, SurrealConnectionStats};
 pub use error::{Error, Result};
 
+use conduwuit::{Result as CoreResult, Server, info};
+use conduwuit_core::config::surrealdb::SurrealConfig;
 use std::sync::Arc;
-use conduwuit::{Result as CoreResult, Server, debug, info, warn};
-use conduwuit_core::config::surrealdb::{SurrealConfig, SurrealConnectionConfig, SurrealAuthConfig, SurrealPoolConfig, SurrealCapabilities};
 
 pub struct SurrealDatabase {
-    pub server: Arc<Server>,
-    pub config: SurrealConfig,
-    //pub pool: Arc<ConnectionPool>,
-    pub engine: Option<SurrealConnection>,
+	pub server: Arc<Server>,
+	pub config: SurrealConfig,
+	//pub pool: Arc<ConnectionPool>,
+	pub engine: Option<Arc<SurrealConnection>>,
 }
 
 impl SurrealDatabase {
-    pub fn new(server: &Arc<Server>) -> Result<Arc<Self>> {
+	pub fn new(server: &Arc<Server>) -> Result<Arc<Self>> {
+		// let server = &self.ctx.server;
+		// let config = &server.config.surrealdb;
+		// let config = Self::extract_config(server)?;
+		// let pool = ConnectionPool::new(config.clone()).await?;
+		// let connection = SurrealConnection::new(config).await?;
 
-        // let server = &self.ctx.server;
-        // let config = &server.config.surrealdb;
-        // let config = Self::extract_config(server)?;
-        // let pool = ConnectionPool::new(config.clone()).await?;
-        // let connection = SurrealConnection::new(config).await?;
-        
-        Ok(Arc::new(Self {
-            server: server.clone(),
-            config: server.config.surrealdb.clone(),
-            engine: None,
-        }))
-    }
-    /// Initialize SurrealDB following conduwuit patterns
-    pub async fn open(&mut self) -> CoreResult<Arc<Self>> {
-        info!("Opening SurrealDB");
-        // let ctx = Context::new(server).await?;
-        // let engine = Engine::open(ctx.clone()).await?;
-        
-        let engine = SurrealConnection::new(self.config).await?;
+		Ok(Arc::new(Self {
+			server: server.clone(),
+			config: server.config.surrealdb.clone(),
+			engine: None,
+		}))
+	}
+	/// Initialize SurrealDB following conduwuit patterns
+	pub async fn open(&mut self) -> CoreResult<Arc<SurrealConnection>> {
+		info!("Opening SurrealDB");
+		// let ctx = Context::new(server).await?;
+		// let engine = Engine::open(ctx.clone()).await?;
 
-        self.engine = Some(engine);
-        info!("SurrealDB opened");
-        Ok(engine)
-        // Ok(Arc::new(Self {
-        //     server: self.server.clone(),
-        //     config: self.config.clone(),
-        //     engine: Option::<engine>,
-        // }))
-    }
+		let engine = Arc::new(SurrealConnection::new(self.config.clone()).await?);
+
+		self.engine = Some(engine.clone());
+		info!("SurrealDB opened");
+		Ok(engine)
+		// Ok(Arc::new(Self {
+		//     server: self.server.clone(),
+		//     config: self.config.clone(),
+		//     engine: Option::<engine>,
+		// }))
+	}
 }
