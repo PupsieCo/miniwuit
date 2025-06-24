@@ -6,15 +6,10 @@ use std::{
 	time::{Duration, Instant},
 };
 
-use async_trait::async_trait;
-use conduwuit::{debug, err, error, trace, warn};
+use conduwuit::{debug, error, trace, warn};
 use surrealdb::Response;
 use surrealdb::Surreal;
 use surrealdb::engine::any::Any;
-use surrealdb::engine::local::File;
-use surrealdb::engine::local::Mem;
-use surrealdb::engine::local::RocksDb;
-use surrealdb::engine::remote::ws::Ws;
 use tokio::sync::RwLock;
 
 use crate::error::{Error, Result as SurrealResult};
@@ -296,25 +291,25 @@ impl SurrealConnection {
 	}
 }
 
-impl ConnectionFactory {
-	pub fn new(config: SurrealConfig) -> Self {
-		Self { config, next_id: AtomicU64::new(1) }
-	}
-
-	/// Create a new connection
-	pub async fn create_connection(&self) -> Result<SurrealConnection> {
-		// let id = self.next_id.fetch_add(1, Ordering::Relaxed);
-		// remove the id for now
-		SurrealConnection::new(self.config.clone())
-			.await
-			.map_err(|e| e.into())
-	}
-
-	/// Get the configuration
-	pub fn config(&self) -> &SurrealConfig {
-		&self.config
-	}
-}
+// impl ConnectionFactory {
+// 	pub fn new(config: SurrealConfig) -> Self {
+// 		Self { config, next_id: AtomicU64::new(1) }
+// 	}
+//
+// 	/// Create a new connection
+// 	pub async fn create_connection(&self) -> Result<SurrealConnection> {
+// 		// let id = self.next_id.fetch_add(1, Ordering::Relaxed);
+// 		// remove the id for now
+// 		SurrealConnection::new(self.config.clone())
+// 			.await
+// 			.map_err(|e| e.into())
+// 	}
+//
+// 	/// Get the configuration
+// 	pub fn config(&self) -> &SurrealConfig {
+// 		&self.config
+// 	}
+// }
 
 impl HealthChecker {
 	pub fn new(interval: Duration, timeout: Duration) -> Self {
