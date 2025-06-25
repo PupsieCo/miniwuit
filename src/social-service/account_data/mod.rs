@@ -16,7 +16,8 @@ use ruma::{
 };
 use serde::Deserialize;
 
-use crate::{Dep, globals};
+use crate::globals;
+use conduwuit_service::{Dep, Args, Service as ServiceTrait};
 
 pub struct Service {
 	services: Services,
@@ -32,8 +33,8 @@ struct Services {
 	globals: Dep<globals::Service>,
 }
 
-impl crate::Service for Service {
-	fn build(args: crate::Args<'_>) -> Result<Arc<Self>> {
+impl ServiceTrait for Service {
+	fn build(args: Args<'_>) -> Result<Arc<Self>> {
 		Ok(Arc::new(Self {
 			services: Services {
 				globals: args.depend::<globals::Service>("globals"),
@@ -45,7 +46,7 @@ impl crate::Service for Service {
 		}))
 	}
 
-	fn name(&self) -> &str { crate::service::make_name(std::module_path!()) }
+	fn name(&self) -> &str { conduwuit_service::service::make_name(std::module_path!()) }
 }
 
 /// Places one event in the account data of the user and removes the

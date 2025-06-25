@@ -9,7 +9,8 @@ use futures::{Stream, StreamExt};
 use ruma::{OwnedServerName, ServerName, UserId};
 
 use super::{Destination, SendingEvent};
-use crate::{Dep, globals};
+use crate::globals;
+use conduwuit_service::{Dep, Args};
 
 pub(super) type OutgoingItem = (Key, SendingEvent, Destination);
 pub(super) type SendingItem = (Key, SendingEvent);
@@ -29,7 +30,7 @@ struct Services {
 }
 
 impl Data {
-	pub(super) fn new(args: &crate::Args<'_>) -> Self {
+	pub(super) fn new(args: &Args<'_>) -> Self {
 		let db = &args.db;
 		Self {
 			servercurrentevent_data: db["servercurrentevent_data"].clone(),

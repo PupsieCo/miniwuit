@@ -14,12 +14,13 @@ use futures::{Stream, StreamExt};
 use ruma::{RoomId, UserId, api::client::search::search_events::v3::Criteria};
 
 use crate::{
-	Dep, rooms,
+	rooms,
 	rooms::{
 		short::ShortRoomId,
 		timeline::{PduId, RawPduId},
 	},
 };
+use conduwuit_service::{Dep, Args, Service as ServiceTrait};
 
 pub struct Service {
 	db: Data,
@@ -51,8 +52,8 @@ const TOKEN_ID_MAX_LEN: usize =
 	size_of::<ShortRoomId>() + WORD_MAX_LEN + 1 + size_of::<RawPduId>();
 const WORD_MAX_LEN: usize = 50;
 
-impl crate::Service for Service {
-	fn build(args: crate::Args<'_>) -> Result<Arc<Self>> {
+impl ServiceTrait for Service {
+	fn build(args: Args<'_>) -> Result<Arc<Self>> {
 		Ok(Arc::new(Self {
 			db: Data { tokenids: args.db["tokenids"].clone() },
 			services: Services {
@@ -64,7 +65,7 @@ impl crate::Service for Service {
 		}))
 	}
 
-	fn name(&self) -> &str { crate::service::make_name(std::module_path!()) }
+	fn name(&self) -> &str { conduwuit_service::service::make_name(std::module_path!()) }
 }
 
 #[implement(Service)]

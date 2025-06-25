@@ -6,7 +6,9 @@ use futures::{StreamExt, future::try_join};
 use ruma::{EventId, RoomId, UserId, api::Direction};
 
 use self::data::{Data, PdusIterItem};
-use crate::{Dep, rooms};
+use crate::rooms;
+
+use conduwuit_service::{Dep, Args, Service as ServiceTrait};
 
 pub struct Service {
 	services: Services,
@@ -18,8 +20,8 @@ struct Services {
 	timeline: Dep<rooms::timeline::Service>,
 }
 
-impl crate::Service for Service {
-	fn build(args: crate::Args<'_>) -> Result<Arc<Self>> {
+impl ServiceTrait for Service {
+	fn build(args: Args<'_>) -> Result<Arc<Self>> {
 		Ok(Arc::new(Self {
 			services: Services {
 				short: args.depend::<rooms::short::Service>("rooms::short"),
@@ -29,7 +31,7 @@ impl crate::Service for Service {
 		}))
 	}
 
-	fn name(&self) -> &str { crate::service::make_name(std::module_path!()) }
+	fn name(&self) -> &str { conduwuit_service::service::make_name(std::module_path!()) }
 }
 
 impl Service {

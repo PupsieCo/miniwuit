@@ -30,7 +30,8 @@ use ruma::{
 	uint,
 };
 
-use crate::{Dep, client, globals, rooms, sending, users};
+use crate::{client, globals, rooms, sending, users};
+use conduwuit_service::{Dep, Args, Service as ServiceTrait};
 
 pub struct Service {
 	db: Data,
@@ -51,8 +52,8 @@ struct Data {
 	pushkey_deviceid: Arc<Map>,
 }
 
-impl crate::Service for Service {
-	fn build(args: crate::Args<'_>) -> Result<Arc<Self>> {
+impl ServiceTrait for Service {
+	fn build(args: Args<'_>) -> Result<Arc<Self>> {
 		Ok(Arc::new(Self {
 			db: Data {
 				senderkey_pusher: args.db["senderkey_pusher"].clone(),
@@ -70,7 +71,7 @@ impl crate::Service for Service {
 		}))
 	}
 
-	fn name(&self) -> &str { crate::service::make_name(std::module_path!()) }
+	fn name(&self) -> &str { conduwuit_service::service::make_name(std::module_path!()) }
 }
 
 impl Service {

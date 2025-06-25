@@ -15,12 +15,14 @@ use futures::{Stream, StreamExt};
 use ruma::{EventId, RoomId, UserId, api::Direction};
 
 use crate::{
-	Dep, rooms,
+	rooms,
 	rooms::{
 		short::{ShortEventId, ShortRoomId},
 		timeline::{PduId, RawPduId},
 	},
 };
+
+use conduwuit_service::{Dep, Args};
 
 pub(super) struct Data {
 	tofrom_relation: Arc<Map>,
@@ -36,7 +38,7 @@ struct Services {
 pub(super) type PdusIterItem = (PduCount, PduEvent);
 
 impl Data {
-	pub(super) fn new(args: &crate::Args<'_>) -> Self {
+	pub(super) fn new(args: &Args<'_>) -> Self {
 		let db = &args.db;
 		Self {
 			tofrom_relation: db["tofrom_relation"].clone(),

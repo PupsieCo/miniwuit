@@ -52,6 +52,7 @@ base64.workspace = true
 bytes.workspace = true
 conduwuit-core.workspace = true
 conduwuit-database.workspace = true
+conduwuit-service.workspace = true
 const-str.workspace = true
 either.workspace = true
 futures.workspace = true

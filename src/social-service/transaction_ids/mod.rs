@@ -3,6 +3,7 @@ use std::sync::Arc;
 use conduwuit::{Result, implement};
 use database::{Handle, Map};
 use ruma::{DeviceId, TransactionId, UserId};
+use conduwuit_service::{Args, Service as ServiceTrait};
 
 pub struct Service {
 	db: Data,
@@ -12,8 +13,8 @@ struct Data {
 	userdevicetxnid_response: Arc<Map>,
 }
 
-impl crate::Service for Service {
-	fn build(args: crate::Args<'_>) -> Result<Arc<Self>> {
+impl ServiceTrait for Service {
+	fn build(args: Args<'_>) -> Result<Arc<Self>> {
 		Ok(Arc::new(Self {
 			db: Data {
 				userdevicetxnid_response: args.db["userdevicetxnid_response"].clone(),
@@ -21,7 +22,7 @@ impl crate::Service for Service {
 		}))
 	}
 
-	fn name(&self) -> &str { crate::service::make_name(std::module_path!()) }
+	fn name(&self) -> &str { conduwuit_service::service::make_name(std::module_path!()) }
 }
 
 #[implement(Service)]

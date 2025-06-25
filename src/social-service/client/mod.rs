@@ -5,7 +5,8 @@ use either::Either;
 use ipaddress::IPAddress;
 use reqwest::redirect;
 
-use crate::{resolver, service};
+use crate::resolver;
+use conduwuit_service::{Args, Service as ServiceTrait};
 
 pub struct Service {
 	pub default: reqwest::Client,
@@ -21,8 +22,8 @@ pub struct Service {
 	pub cidr_range_denylist: Vec<IPAddress>,
 }
 
-impl crate::Service for Service {
-	fn build(args: crate::Args<'_>) -> Result<Arc<Self>> {
+impl ServiceTrait for Service {
+	fn build(args: Args<'_>) -> Result<Arc<Self>> {
 		let config = &args.server.config;
 		let resolver = args.require::<resolver::Service>("resolver");
 
@@ -115,7 +116,7 @@ impl crate::Service for Service {
 		}))
 	}
 
-	fn name(&self) -> &str { service::make_name(std::module_path!()) }
+	fn name(&self) -> &str { conduwuit_service::service::make_name(std::module_path!()) }
 }
 
 fn base(config: &Config) -> Result<reqwest::ClientBuilder> {

@@ -28,7 +28,8 @@ use ruma::{
 	serde::Raw,
 };
 
-use crate::{Dep, account_data, appservice::RegistrationInfo, config, globals, rooms, users};
+use crate::{account_data, appservice::RegistrationInfo, globals, rooms, users};
+use conduwuit_service::{Dep, Args, Service as ServiceTrait, config};
 
 pub struct Service {
 	appservice_in_room_cache: AppServiceInRoomCache,
@@ -66,8 +67,8 @@ type AppServiceInRoomCache = RwLock<HashMap<OwnedRoomId, HashMap<String, bool>>>
 type StrippedStateEventItem = (OwnedRoomId, Vec<Raw<AnyStrippedStateEvent>>);
 type SyncStateEventItem = (OwnedRoomId, Vec<Raw<AnySyncStateEvent>>);
 
-impl crate::Service for Service {
-	fn build(args: crate::Args<'_>) -> Result<Arc<Self>> {
+impl ServiceTrait for Service {
+	fn build(args: Args<'_>) -> Result<Arc<Self>> {
 		Ok(Arc::new(Self {
 			appservice_in_room_cache: RwLock::new(HashMap::new()),
 			services: Services {
@@ -98,7 +99,7 @@ impl crate::Service for Service {
 		}))
 	}
 
-	fn name(&self) -> &str { crate::service::make_name(std::module_path!()) }
+	fn name(&self) -> &str { conduwuit_service::service::make_name(std::module_path!()) }
 }
 
 impl Service {

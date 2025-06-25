@@ -25,12 +25,13 @@ use ruma::{
 };
 
 use crate::{
-	Dep, globals, rooms,
+	globals, rooms,
 	rooms::{
 		short::{ShortEventId, ShortStateHash},
 		state_compressor::{CompressedState, parse_compressed_state_event},
 	},
 };
+use conduwuit_service::{Dep, Args, Service as ServiceTrait};
 
 pub struct Service {
 	pub mutex: RoomMutexMap,
@@ -58,8 +59,8 @@ type RoomMutexMap = MutexMap<OwnedRoomId, ()>;
 pub type RoomMutexGuard = MutexMapGuard<OwnedRoomId, ()>;
 
 #[async_trait]
-impl crate::Service for Service {
-	fn build(args: crate::Args<'_>) -> Result<Arc<Self>> {
+impl ServiceTrait for Service {
+	fn build(args: Args<'_>) -> Result<Arc<Self>> {
 		Ok(Arc::new(Self {
 			mutex: RoomMutexMap::new(),
 			services: Services {
@@ -88,7 +89,7 @@ impl crate::Service for Service {
 		Ok(())
 	}
 
-	fn name(&self) -> &str { crate::service::make_name(std::module_path!()) }
+	fn name(&self) -> &str { conduwuit_service::service::make_name(std::module_path!()) }
 }
 
 impl Service {

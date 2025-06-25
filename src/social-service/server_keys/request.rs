@@ -10,6 +10,7 @@ use ruma::{
 	},
 };
 
+
 #[implement(super::Service)]
 pub(super) async fn batch_notary_request<'a, S, K>(
 	&self,

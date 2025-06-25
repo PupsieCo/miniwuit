@@ -9,7 +9,8 @@ use ruma::{
 	push::Ruleset,
 };
 
-use crate::{Dep, account_data, config, globals, users};
+use crate::{account_data, globals, users};
+use conduwuit_service::{Dep, Args, Service as ServiceTrait, config};
 
 pub struct Service {
 	services: Services,
@@ -23,8 +24,8 @@ struct Services {
 }
 
 #[async_trait]
-impl crate::Service for Service {
-	fn build(args: crate::Args<'_>) -> Result<Arc<Self>> {
+impl ServiceTrait for Service {
+	fn build(args: Args<'_>) -> Result<Arc<Self>> {
 		Ok(Arc::new(Self {
 			services: Services {
 				account_data: args.depend::<account_data::Service>("account_data"),
@@ -46,7 +47,7 @@ impl crate::Service for Service {
 		})
 	}
 
-	fn name(&self) -> &str { crate::service::make_name(std::module_path!()) }
+	fn name(&self) -> &str { conduwuit_service::service::make_name(std::module_path!()) }
 }
 
 impl Service {

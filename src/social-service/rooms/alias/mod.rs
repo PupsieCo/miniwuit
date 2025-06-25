@@ -16,7 +16,8 @@ use ruma::{
 	},
 };
 
-use crate::{Dep, admin, appservice, appservice::RegistrationInfo, globals, rooms, sending};
+use crate::{admin, appservice, appservice::RegistrationInfo, globals, rooms, sending};
+use conduwuit_service::{Dep, Args, Service as ServiceTrait};
 
 pub struct Service {
 	db: Data,
@@ -38,8 +39,8 @@ struct Services {
 	state_accessor: Dep<rooms::state_accessor::Service>,
 }
 
-impl crate::Service for Service {
-	fn build(args: crate::Args<'_>) -> Result<Arc<Self>> {
+impl ServiceTrait for Service {
+	fn build(args: Args<'_>) -> Result<Arc<Self>> {
 		Ok(Arc::new(Self {
 			db: Data {
 				alias_userid: args.db["alias_userid"].clone(),
@@ -58,7 +59,7 @@ impl crate::Service for Service {
 		}))
 	}
 
-	fn name(&self) -> &str { crate::service::make_name(std::module_path!()) }
+	fn name(&self) -> &str { conduwuit_service::service::make_name(std::module_path!()) }
 }
 
 impl Service {

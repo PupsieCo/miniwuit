@@ -10,7 +10,8 @@ use tokio::{
 	time::{MissedTickBehavior, interval},
 };
 
-use crate::{Dep, admin, client, globals};
+use crate::{admin, client, globals};
+use conduwuit_service::{Dep, Args, Service as ServiceTrait};
 
 pub struct Service {
 	interval: Duration,
@@ -43,8 +44,8 @@ const CHECK_FOR_UPDATES_INTERVAL: u64 = 7200; // 2 hours
 const LAST_CHECK_FOR_UPDATES_COUNT: &[u8; 1] = b"u";
 
 #[async_trait]
-impl crate::Service for Service {
-	fn build(args: crate::Args<'_>) -> Result<Arc<Self>> {
+impl ServiceTrait for Service {
+	fn build(args: Args<'_>) -> Result<Arc<Self>> {
 		Ok(Arc::new(Self {
 			interval: Duration::from_secs(CHECK_FOR_UPDATES_INTERVAL),
 			interrupt: Notify::new(),
@@ -84,7 +85,7 @@ impl crate::Service for Service {
 
 	fn interrupt(&self) { self.interrupt.notify_waiters(); }
 
-	fn name(&self) -> &str { crate::service::make_name(std::module_path!()) }
+	fn name(&self) -> &str { conduwuit_service::service::make_name(std::module_path!()) }
 }
 
 impl Service {

@@ -11,7 +11,7 @@ use ruma::ServerName;
 
 use super::{
 	cache::{CachedDest, CachedOverride, MAX_IPS},
-	fed::{FedDest, PortString, add_port_to_hostname, get_ip_with_port},
+	fed::{FedDest, PortString, add_port_to_hostname, get_ip_with_port}
 };
 
 #[derive(Clone, Debug)]

@@ -22,7 +22,8 @@ use ruma::{
 };
 use serde_json::value::RawValue as RawJsonValue;
 
-use crate::{Dep, globals, sending};
+use crate::{globals, sending};
+use conduwuit_service::{Dep, Args, Service as ServiceTrait};
 
 pub struct Service {
 	keypair: Box<Ed25519KeyPair>,
@@ -46,8 +47,8 @@ pub type VerifyKeys = BTreeMap<OwnedServerSigningKeyId, VerifyKey>;
 pub type PubKeyMap = PublicKeyMap;
 pub type PubKeys = PublicKeySet;
 
-impl crate::Service for Service {
-	fn build(args: crate::Args<'_>) -> Result<Arc<Self>> {
+impl ServiceTrait for Service {
+	fn build(args: Args<'_>) -> Result<Arc<Self>> {
 		let minimum_valid = Duration::from_secs(3600);
 
 		let (keypair, verify_keys) = keypair::init(args.db)?;
@@ -68,7 +69,7 @@ impl crate::Service for Service {
 		}))
 	}
 
-	fn name(&self) -> &str { crate::service::make_name(std::module_path!()) }
+	fn name(&self) -> &str { conduwuit_service::service::make_name(std::module_path!()) }
 }
 
 #[implement(Service)]

@@ -4,6 +4,8 @@ use conduwuit::{Result, implement, matrix::pdu::PduEvent};
 use conduwuit_database::{Deserialized, Json, Map};
 use ruma::{CanonicalJsonObject, EventId};
 
+use conduwuit_service::{Args, Service as ServiceTrait};
+
 pub struct Service {
 	db: Data,
 }
@@ -12,8 +14,8 @@ struct Data {
 	eventid_outlierpdu: Arc<Map>,
 }
 
-impl crate::Service for Service {
-	fn build(args: crate::Args<'_>) -> Result<Arc<Self>> {
+impl ServiceTrait for Service {
+	fn build(args: Args<'_>) -> Result<Arc<Self>> {
 		Ok(Arc::new(Self {
 			db: Data {
 				eventid_outlierpdu: args.db["eventid_outlierpdu"].clone(),
@@ -21,7 +23,7 @@ impl crate::Service for Service {
 		}))
 	}
 
-	fn name(&self) -> &str { crate::service::make_name(std::module_path!()) }
+	fn name(&self) -> &str { conduwuit_service::service::make_name(std::module_path!()) }
 }
 
 /// Returns the pdu from the outlier tree.

@@ -14,7 +14,8 @@ use ruma::{OwnedUserId, UInt, UserId, events::presence::PresenceEvent, presence:
 use tokio::time::sleep;
 
 use self::{data::Data, presence::Presence};
-use crate::{Dep, globals, users};
+use crate::{globals, users};
+use conduwuit_service::{Dep, Args, Service as ServiceTrait};
 
 pub struct Service {
 	timer_channel: (Sender<TimerType>, Receiver<TimerType>),
@@ -35,8 +36,8 @@ struct Services {
 type TimerType = (OwnedUserId, Duration);
 
 #[async_trait]
-impl crate::Service for Service {
-	fn build(args: crate::Args<'_>) -> Result<Arc<Self>> {
+impl ServiceTrait for Service {
+	fn build(args: Args<'_>) -> Result<Arc<Self>> {
 		let config = &args.server.config;
 		let idle_timeout_s = config.presence_idle_timeout_s;
 		let offline_timeout_s = config.presence_offline_timeout_s;
@@ -84,7 +85,7 @@ impl crate::Service for Service {
 		}
 	}
 
-	fn name(&self) -> &str { crate::service::make_name(std::module_path!()) }
+	fn name(&self) -> &str { conduwuit_service::service::make_name(std::module_path!()) }
 }
 
 impl Service {

@@ -4,7 +4,8 @@ use conduwuit::{Result, implement};
 use database::{Database, Deserialized, Map};
 use ruma::{RoomId, UserId};
 
-use crate::{Dep, globals, rooms, rooms::short::ShortStateHash};
+use crate::{globals, rooms, rooms::short::ShortStateHash};
+use conduwuit_service::{Dep, Args, Service as ServiceTrait};
 
 pub struct Service {
 	db: Data,
@@ -24,8 +25,8 @@ struct Services {
 	short: Dep<rooms::short::Service>,
 }
 
-impl crate::Service for Service {
-	fn build(args: crate::Args<'_>) -> Result<Arc<Self>> {
+impl ServiceTrait for Service {
+	fn build(args: Args<'_>) -> Result<Arc<Self>> {
 		Ok(Arc::new(Self {
 			db: Data {
 				db: args.db.clone(),
@@ -42,7 +43,7 @@ impl crate::Service for Service {
 		}))
 	}
 
-	fn name(&self) -> &str { crate::service::make_name(std::module_path!()) }
+	fn name(&self) -> &str { conduwuit_service::service::make_name(std::module_path!()) }
 }
 
 #[implement(Service)]

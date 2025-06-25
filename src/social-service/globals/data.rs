@@ -2,6 +2,7 @@ use std::sync::{Arc, RwLock};
 
 use conduwuit::{Result, utils};
 use database::{Database, Deserialized, Map};
+use conduwuit_service::Args;
 
 pub struct Data {
 	global: Arc<Map>,
@@ -12,7 +13,7 @@ pub struct Data {
 const COUNTER: &[u8] = b"c";
 
 impl Data {
-	pub(super) fn new(args: &crate::Args<'_>) -> Self {
+	pub(super) fn new(args: &Args<'_>) -> Self {
 		let db = &args.db;
 		Self {
 			global: db["global"].clone(),

@@ -4,6 +4,7 @@ use std::{
 };
 
 use conduwuit::{Err, Result, err, utils, utils::math::usize_from_f64};
+use conduwuit_service::Args;
 use database::Map;
 use lru_cache::LruCache;
 
@@ -15,7 +16,7 @@ pub(super) struct Data {
 }
 
 impl Data {
-	pub(super) fn new(args: &crate::Args<'_>) -> Self {
+	pub(super) fn new(args: &Args<'_>) -> Self {
 		let db = &args.db;
 		let config = &args.server.config;
 		let cache_size = f64::from(config.auth_chain_cache_capacity);

@@ -13,7 +13,6 @@ use ipaddress::IPAddress;
 use serde::Serialize;
 use url::Url;
 
-use super::Service;
 
 #[derive(Serialize, Default)]
 pub struct UrlPreviewData {
@@ -31,13 +30,13 @@ pub struct UrlPreviewData {
 	pub image_height: Option<u32>,
 }
 
-#[implement(Service)]
+#[implement(super::Service)]
 pub async fn remove_url_preview(&self, url: &str) -> Result<()> {
 	// TODO: also remove the downloaded image
 	self.db.remove_url_preview(url)
 }
 
-#[implement(Service)]
+#[implement(super::Service)]
 pub async fn set_url_preview(&self, url: &str, data: &UrlPreviewData) -> Result<()> {
 	let now = SystemTime::now()
 		.duration_since(SystemTime::UNIX_EPOCH)
@@ -45,7 +44,7 @@ pub async fn set_url_preview(&self, url: &str, data: &UrlPreviewData) -> Result<
 	self.db.set_url_preview(url, data, now)
 }
 
-#[implement(Service)]
+#[implement(super::Service)]
 pub async fn get_url_preview(&self, url: &Url) -> Result<UrlPreviewData> {
 	if let Ok(preview) = self.db.get_url_preview(url.as_str()).await {
 		return Ok(preview);
@@ -60,7 +59,7 @@ pub async fn get_url_preview(&self, url: &Url) -> Result<UrlPreviewData> {
 	}
 }
 
-#[implement(Service)]
+#[implement(super::Service)]
 async fn request_url_preview(&self, url: &Url) -> Result<UrlPreviewData> {
 	if let Ok(ip) = IPAddress::parse(url.host_str().expect("URL previously validated")) {
 		if !self.services.client.valid_cidr_range(&ip) {
@@ -103,7 +102,7 @@ async fn request_url_preview(&self, url: &Url) -> Result<UrlPreviewData> {
 }
 
 #[cfg(feature = "url_preview")]
-#[implement(Service)]
+#[implement(super::Service)]
 pub async fn download_image(&self, url: &str) -> Result<UrlPreviewData> {
 	use conduwuit::utils::random_string;
 	use image::ImageReader;
@@ -137,13 +136,13 @@ pub async fn download_image(&self, url: &str) -> Result<UrlPreviewData> {
 }
 
 #[cfg(not(feature = "url_preview"))]
-#[implement(Service)]
+#[implement(super::Service)]
 pub async fn download_image(&self, _url: &str) -> Result<UrlPreviewData> {
 	Err!(FeatureDisabled("url_preview"))
 }
 
 #[cfg(feature = "url_preview")]
-#[implement(Service)]
+#[implement(super::Service)]
 async fn download_html(&self, url: &str) -> Result<UrlPreviewData> {
 	use webpage::HTML;
 
@@ -184,12 +183,12 @@ async fn download_html(&self, url: &str) -> Result<UrlPreviewData> {
 }
 
 #[cfg(not(feature = "url_preview"))]
-#[implement(Service)]
+#[implement(super::Service)]
 async fn download_html(&self, _url: &str) -> Result<UrlPreviewData> {
 	Err!(FeatureDisabled("url_preview"))
 }
 
-#[implement(Service)]
+#[implement(super::Service)]
 pub fn url_preview_allowed(&self, url: &Url) -> bool {
 	if ["http", "https"]
 		.iter()

@@ -51,12 +51,13 @@ use serde_json::value::{RawValue as RawJsonValue, to_raw_value};
 use self::data::Data;
 pub use self::data::PdusIterItem;
 use crate::{
-	Dep, account_data, admin, appservice,
+	account_data, admin, appservice,
 	appservice::NamespaceRegex,
 	globals, pusher, rooms,
 	rooms::{short::ShortRoomId, state_compressor::CompressedState},
 	sending, server_keys, users,
 };
+use conduwuit_service::{Dep, Args, Service as ServiceTrait};
 
 // Update Relationships
 #[derive(Deserialize)]
@@ -114,8 +115,8 @@ type RoomMutexMap = MutexMap<OwnedRoomId, ()>;
 pub type RoomMutexGuard = MutexMapGuard<OwnedRoomId, ()>;
 
 #[async_trait]
-impl crate::Service for Service {
-	fn build(args: crate::Args<'_>) -> Result<Arc<Self>> {
+impl ServiceTrait for Service {
+	fn build(args: Args<'_>) -> Result<Arc<Self>> {
 		Ok(Arc::new(Self {
 			services: Services {
 				server: args.server.clone(),
@@ -154,7 +155,7 @@ impl crate::Service for Service {
 		Ok(())
 	}
 
-	fn name(&self) -> &str { crate::service::make_name(std::module_path!()) }
+	fn name(&self) -> &str { conduwuit_service::service::make_name(std::module_path!()) }
 }
 
 impl Service {

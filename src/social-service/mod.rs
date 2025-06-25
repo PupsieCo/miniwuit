@@ -1,16 +1,16 @@
 #![type_length_limit = "2048"]
 #![allow(refining_impl_trait)]
 
-mod manager;
+// mod manager;
 mod migrations;
-mod service;
+// mod service;
 pub mod services;
 
 pub mod account_data;
 pub mod admin;
 pub mod appservice;
 pub mod client;
-pub mod config;
+// pub mod config;
 pub mod emergency;
 pub mod federation;
 pub mod globals;
@@ -30,8 +30,9 @@ pub mod users;
 
 extern crate conduwuit_core as conduwuit;
 extern crate conduwuit_database as database;
+extern crate conduwuit_service as conduwuit_service;
 
-pub(crate) use service::{Args, Dep, Service};
+// pub(crate) use service::{Args, Dep, Service};
 
 pub use crate::services::Services;
 

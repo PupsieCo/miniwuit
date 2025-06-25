@@ -6,6 +6,7 @@ use conduwuit::{
 	at, err, implement,
 	utils::{math::Expected, rand, stream::TryIgnore},
 };
+use conduwuit_service::Args;
 use database::{Cbor, Deserialized, Map};
 use futures::{Stream, StreamExt, future::join};
 use ruma::ServerName;
@@ -37,7 +38,7 @@ pub type IpAddrs = ArrayVec<IpAddr, MAX_IPS>;
 pub(crate) const MAX_IPS: usize = 3;
 
 impl Cache {
-	pub(super) fn new(args: &crate::Args<'_>) -> Arc<Self> {
+	pub(super) fn new(args: &Args<'_>) -> Arc<Self> {
 		Arc::new(Self {
 			destinations: args.db["servername_destination"].clone(),
 			overrides: args.db["servername_override"].clone(),

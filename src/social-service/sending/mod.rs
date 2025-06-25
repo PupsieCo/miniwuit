@@ -30,9 +30,10 @@ pub use self::{
 	sender::{EDU_LIMIT, PDU_LIMIT},
 };
 use crate::{
-	Dep, account_data, client, federation, globals, presence, pusher, rooms,
+	account_data, client, federation, globals, presence, pusher, rooms,
 	rooms::timeline::RawPduId, users,
 };
+use conduwuit_service::{Dep, Args, Service as ServiceTrait};
 
 pub struct Service {
 	pub db: Data,
@@ -79,8 +80,8 @@ const EDU_BUF_CAP: usize = 128;
 const EDU_VEC_CAP: usize = 1;
 
 #[async_trait]
-impl crate::Service for Service {
-	fn build(args: crate::Args<'_>) -> Result<Arc<Self>> {
+impl ServiceTrait for Service {
+	fn build(args: Args<'_>) -> Result<Arc<Self>> {
 		let num_senders = num_senders(&args);
 		Ok(Arc::new(Self {
 			db: Data::new(&args),
@@ -145,7 +146,7 @@ impl crate::Service for Service {
 		}
 	}
 
-	fn name(&self) -> &str { crate::service::make_name(std::module_path!()) }
+	fn name(&self) -> &str { conduwuit_service::service::make_name(std::module_path!()) }
 
 	fn unconstrained(&self) -> bool { true }
 }
@@ -399,7 +400,7 @@ impl Service {
 	}
 }
 
-fn num_senders(args: &crate::Args<'_>) -> usize {
+fn num_senders(args: &Args<'_>) -> usize {
 	const MIN_SENDERS: usize = 1;
 	// Limit the number of senders to the number of workers threads or number of
 	// cores, conservatively.

@@ -12,7 +12,8 @@ use async_trait::async_trait;
 use conduwuit::{Result, Server, arrayvec::ArrayString, utils::MutexMap};
 
 use self::{cache::Cache, dns::Resolver};
-use crate::{Dep, client};
+use crate::client;
+use conduwuit_service::{Dep, Args, Service as ServiceTrait};
 
 pub struct Service {
 	pub cache: Arc<Cache>,
@@ -30,9 +31,9 @@ type Resolving = MutexMap<NameBuf, ()>;
 type NameBuf = ArrayString<256>;
 
 #[async_trait]
-impl crate::Service for Service {
+impl ServiceTrait for Service {
 	#[allow(clippy::as_conversions, clippy::cast_sign_loss, clippy::cast_possible_truncation)]
-	fn build(args: crate::Args<'_>) -> Result<Arc<Self>> {
+	fn build(args: Args<'_>) -> Result<Arc<Self>> {
 		let cache = Cache::new(&args);
 		Ok(Arc::new(Self {
 			cache: cache.clone(),
@@ -50,5 +51,5 @@ impl crate::Service for Service {
 		self.cache.clear().await;
 	}
 
-	fn name(&self) -> &str { crate::service::make_name(std::module_path!()) }
+	fn name(&self) -> &str { conduwuit_service::service::make_name(std::module_path!()) }
 }

@@ -10,6 +10,8 @@ use database::{Database, Deserialized, Handle, Interfix, Map, Qry};
 use futures::{Stream, StreamExt, pin_mut};
 use ruma::{DeviceId, OwnedUserId, RoomId, UserId, api::client::filter::LazyLoadOptions};
 
+use conduwuit_service::{Args, Service as ServiceTrait};
+
 pub struct Service {
 	db: Data,
 }
@@ -42,8 +44,8 @@ pub enum Status {
 pub type Witness = HashSet<OwnedUserId>;
 type Key<'a> = (&'a UserId, &'a DeviceId, &'a RoomId, &'a UserId);
 
-impl crate::Service for Service {
-	fn build(args: crate::Args<'_>) -> Result<Arc<Self>> {
+impl ServiceTrait for Service {
+	fn build(args: Args<'_>) -> Result<Arc<Self>> {
 		Ok(Arc::new(Self {
 			db: Data {
 				lazyloadedids: args.db["lazyloadedids"].clone(),
@@ -52,7 +54,7 @@ impl crate::Service for Service {
 		}))
 	}
 
-	fn name(&self) -> &str { crate::service::make_name(std::module_path!()) }
+	fn name(&self) -> &str { conduwuit_service::service::make_name(std::module_path!()) }
 }
 
 #[implement(Service)]

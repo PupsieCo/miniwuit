@@ -12,7 +12,8 @@ use ruma::{
 };
 use tokio::sync::{RwLock, broadcast};
 
-use crate::{Dep, globals, sending, sending::EduBuf, users};
+use crate::{globals, sending, sending::EduBuf, users};
+use conduwuit_service::{Dep, Args, Service as ServiceTrait};
 
 pub struct Service {
 	server: Arc<Server>,
@@ -30,8 +31,8 @@ struct Services {
 	users: Dep<users::Service>,
 }
 
-impl crate::Service for Service {
-	fn build(args: crate::Args<'_>) -> Result<Arc<Self>> {
+impl ServiceTrait for Service {
+	fn build(args: Args<'_>) -> Result<Arc<Self>> {
 		Ok(Arc::new(Self {
 			server: args.server.clone(),
 			services: Services {
@@ -45,7 +46,7 @@ impl crate::Service for Service {
 		}))
 	}
 
-	fn name(&self) -> &str { crate::service::make_name(std::module_path!()) }
+	fn name(&self) -> &str { conduwuit_service::service::make_name(std::module_path!()) }
 }
 
 impl Service {

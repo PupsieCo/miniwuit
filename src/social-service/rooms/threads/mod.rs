@@ -16,7 +16,8 @@ use ruma::{
 };
 use serde_json::json;
 
-use crate::{Dep, rooms, rooms::short::ShortRoomId};
+use crate::{rooms, rooms::short::ShortRoomId};
+use conduwuit_service::{Dep, Args, Service as ServiceTrait};
 
 pub struct Service {
 	db: Data,
@@ -32,8 +33,8 @@ pub(super) struct Data {
 	threadid_userids: Arc<Map>,
 }
 
-impl crate::Service for Service {
-	fn build(args: crate::Args<'_>) -> Result<Arc<Self>> {
+impl ServiceTrait for Service {
+	fn build(args: Args<'_>) -> Result<Arc<Self>> {
 		Ok(Arc::new(Self {
 			db: Data {
 				threadid_userids: args.db["threadid_userids"].clone(),
@@ -45,7 +46,7 @@ impl crate::Service for Service {
 		}))
 	}
 
-	fn name(&self) -> &str { crate::service::make_name(std::module_path!()) }
+	fn name(&self) -> &str { conduwuit_service::service::make_name(std::module_path!()) }
 }
 
 impl Service {

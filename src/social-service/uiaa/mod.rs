@@ -16,7 +16,8 @@ use ruma::{
 	},
 };
 
-use crate::{Dep, config, globals, users};
+use crate::{globals, users};
+use conduwuit_service::{Dep, Args, Service as ServiceTrait, config};
 
 pub struct Service {
 	userdevicesessionid_uiaarequest: RwLock<RequestMap>,
@@ -39,8 +40,8 @@ type RequestKey = (OwnedUserId, OwnedDeviceId, String);
 
 pub const SESSION_ID_LENGTH: usize = 32;
 
-impl crate::Service for Service {
-	fn build(args: crate::Args<'_>) -> Result<Arc<Self>> {
+impl ServiceTrait for Service {
+	fn build(args: Args<'_>) -> Result<Arc<Self>> {
 		Ok(Arc::new(Self {
 			userdevicesessionid_uiaarequest: RwLock::new(RequestMap::new()),
 			db: Data {
@@ -54,7 +55,7 @@ impl crate::Service for Service {
 		}))
 	}
 
-	fn name(&self) -> &str { crate::service::make_name(std::module_path!()) }
+	fn name(&self) -> &str { conduwuit_service::service::make_name(std::module_path!()) }
 }
 
 #[implement(Service)]

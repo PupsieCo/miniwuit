@@ -12,7 +12,8 @@ use rustyline_async::{Readline, ReadlineError, ReadlineEvent};
 use termimad::MadSkin;
 use tokio::task::JoinHandle;
 
-use crate::{Dep, admin};
+use crate::{admin};
+use conduwuit_service::{Dep, Args, Service as ServiceTrait};
 
 pub struct Console {
 	server: Arc<Server>,
@@ -28,7 +29,7 @@ const PROMPT: &str = "uwu> ";
 const HISTORY_LIMIT: usize = 48;
 
 impl Console {
-	pub(super) fn new(args: &crate::Args<'_>) -> Arc<Self> {
+	pub(super) fn new(args: &Args<'_>) -> Arc<Self> {
 		Arc::new(Self {
 			server: args.server.clone(),
 			admin: args.depend::<admin::Service>("admin"),

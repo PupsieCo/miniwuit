@@ -11,7 +11,8 @@ use futures::{FutureExt, Stream, TryFutureExt, TryStreamExt, future::select_ok, 
 use ruma::{CanonicalJsonObject, EventId, OwnedUserId, RoomId, UserId, api::Direction};
 
 use super::{PduId, RawPduId};
-use crate::{Dep, rooms, rooms::short::ShortRoomId};
+use crate::{rooms, rooms::short::ShortRoomId};
+use conduwuit_service::{Dep, Args};
 
 pub(super) struct Data {
 	eventid_outlierpdu: Arc<Map>,
@@ -30,7 +31,7 @@ struct Services {
 pub type PdusIterItem = (PduCount, PduEvent);
 
 impl Data {
-	pub(super) fn new(args: &crate::Args<'_>) -> Self {
+	pub(super) fn new(args: &Args<'_>) -> Self {
 		let db = &args.db;
 		Self {
 			eventid_outlierpdu: db["eventid_outlierpdu"].clone(),

@@ -35,7 +35,8 @@ use ruma::{
 use tokio::sync::{Mutex, MutexGuard};
 
 pub use self::pagination_token::PaginationToken;
-use crate::{Dep, rooms, sending};
+use crate::{rooms, sending};
+use conduwuit_service::{Dep, Args, Service as ServiceTrait};
 
 pub struct Service {
 	services: Services,
@@ -71,8 +72,8 @@ pub enum Identifier<'a> {
 type Cache = LruCache<OwnedRoomId, Option<CachedSpaceHierarchySummary>>;
 
 #[async_trait]
-impl crate::Service for Service {
-	fn build(args: crate::Args<'_>) -> Result<Arc<Self>> {
+impl ServiceTrait for Service {
+	fn build(args: Args<'_>) -> Result<Arc<Self>> {
 		let config = &args.server.config;
 		let cache_size = f64::from(config.roomid_spacehierarchy_cache_capacity);
 		let cache_size = cache_size * config.cache_capacity_modifier;
@@ -101,7 +102,7 @@ impl crate::Service for Service {
 
 	async fn clear_cache(&self) { self.roomid_spacehierarchy_cache.lock().await.clear(); }
 
-	fn name(&self) -> &str { crate::service::make_name(std::module_path!()) }
+	fn name(&self) -> &str { conduwuit_service::service::make_name(std::module_path!()) }
 }
 
 /// Gets the summary of a space using solely local information

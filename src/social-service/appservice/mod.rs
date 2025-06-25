@@ -11,7 +11,8 @@ use ruma::{RoomAliasId, RoomId, UserId, api::appservice::Registration};
 use tokio::sync::RwLock;
 
 pub use self::{namespace_regex::NamespaceRegex, registration_info::RegistrationInfo};
-use crate::{Dep, sending};
+use crate::sending;
+use conduwuit_service::{Dep, Args, Service as ServiceTrait};
 
 pub struct Service {
 	registration_info: RwLock<BTreeMap<String, RegistrationInfo>>,
@@ -28,8 +29,8 @@ struct Data {
 }
 
 #[async_trait]
-impl crate::Service for Service {
-	fn build(args: crate::Args<'_>) -> Result<Arc<Self>> {
+impl ServiceTrait for Service {
+	fn build(args: Args<'_>) -> Result<Arc<Self>> {
 		Ok(Arc::new(Self {
 			registration_info: RwLock::new(BTreeMap::new()),
 			services: Services {
@@ -56,7 +57,7 @@ impl crate::Service for Service {
 		Ok(())
 	}
 
-	fn name(&self) -> &str { crate::service::make_name(std::module_path!()) }
+	fn name(&self) -> &str { conduwuit_service::service::make_name(std::module_path!()) }
 }
 
 impl Service {

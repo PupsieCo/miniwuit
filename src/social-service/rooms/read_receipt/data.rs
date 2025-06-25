@@ -12,7 +12,8 @@ use ruma::{
 	serde::Raw,
 };
 
-use crate::{Dep, globals};
+use crate::globals;
+use conduwuit_service::{Dep, Args};
 
 pub(super) struct Data {
 	roomuserid_privateread: Arc<Map>,
@@ -28,7 +29,7 @@ struct Services {
 pub(super) type ReceiptItem<'a> = (&'a UserId, u64, Raw<AnySyncEphemeralRoomEvent>);
 
 impl Data {
-	pub(super) fn new(args: &crate::Args<'_>) -> Self {
+	pub(super) fn new(args: &Args<'_>) -> Self {
 		let db = &args.db;
 		Self {
 			roomuserid_privateread: db["roomuserid_privateread"].clone(),

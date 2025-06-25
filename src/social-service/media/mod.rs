@@ -22,7 +22,8 @@ use tokio::{
 
 use self::data::{Data, Metadata};
 pub use self::thumbnail::Dim;
-use crate::{Dep, client, globals, sending};
+use crate::{client, globals, sending};
+use conduwuit_service::{Dep, Args, Service as ServiceTrait};
 
 #[derive(Debug)]
 pub struct FileMeta {
@@ -54,8 +55,8 @@ pub const CACHE_CONTROL_IMMUTABLE: &str = "public,max-age=31536000,immutable";
 pub const CORP_CROSS_ORIGIN: &str = "cross-origin";
 
 #[async_trait]
-impl crate::Service for Service {
-	fn build(args: crate::Args<'_>) -> Result<Arc<Self>> {
+impl ServiceTrait for Service {
+	fn build(args: Args<'_>) -> Result<Arc<Self>> {
 		Ok(Arc::new(Self {
 			url_preview_mutex: MutexMap::new(),
 			db: Data::new(args.db),
@@ -74,7 +75,7 @@ impl crate::Service for Service {
 		Ok(())
 	}
 
-	fn name(&self) -> &str { crate::service::make_name(std::module_path!()) }
+	fn name(&self) -> &str { conduwuit_service::service::make_name(std::module_path!()) }
 }
 
 impl Service {

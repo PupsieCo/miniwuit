@@ -9,7 +9,8 @@ use futures::Stream;
 use ruma::{UInt, UserId, events::presence::PresenceEvent, presence::PresenceState};
 
 use super::Presence;
-use crate::{Dep, globals, users};
+use crate::{globals, users};
+use conduwuit_service::{Dep, Args};
 
 pub(crate) struct Data {
 	presenceid_presence: Arc<Map>,
@@ -23,7 +24,7 @@ struct Services {
 }
 
 impl Data {
-	pub(super) fn new(args: &crate::Args<'_>) -> Self {
+	pub(super) fn new(args: &Args<'_>) -> Self {
 		let db = &args.db;
 		Self {
 			presenceid_presence: db["presenceid_presence"].clone(),

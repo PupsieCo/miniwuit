@@ -3,19 +3,19 @@ use std::{
 	collections::BTreeMap,
 	sync::{Arc, RwLock},
 };
-
+use async_trait::async_trait;
 use conduwuit::{Result, Server, debug, debug_info, info, trace, utils::stream::IterStream};
 use database::Database;
 use futures::{Stream, StreamExt, TryStreamExt};
 use tokio::sync::Mutex;
 
 use crate::{
-	account_data, admin, appservice, client, config, emergency, federation, globals, key_backups,
-	manager::Manager,
-	media, presence, pusher, resolver, rooms, sending, server_keys, service,
-	service::{Args, Map, Service},
+	account_data, admin, appservice, client, emergency, federation, globals, key_backups,
+	media, presence, pusher, resolver, rooms, sending, server_keys,
 	sync, transaction_ids, uiaa, updates, users,
 };
+
+use conduwuit_service::{Args, Map, Service, Manager, ServicesTrait, config};
 
 pub struct Services {
 	pub account_data: Arc<account_data::Service>,
@@ -40,15 +40,18 @@ pub struct Services {
 	pub updates: Arc<updates::Service>,
 	pub users: Arc<users::Service>,
 
-	manager: Mutex<Option<Arc<Manager>>>,
+	manager: Mutex<Option<Arc<Manager<Self>>>>,
 	pub(crate) service: Arc<Map>,
 	pub server: Arc<Server>,
 	pub db: Arc<Database>,
 }
 
-impl Services {
+#[async_trait]
+impl ServicesTrait for Services {
+	type Services = Self;
+
 	#[allow(clippy::cognitive_complexity)]
-	pub async fn build(server: Arc<Server>) -> Result<Arc<Self>> {
+	async fn build(server: Arc<Server>) -> Result<Arc<Self>> {
 		let db = Database::open(&server).await?;
 		let service: Arc<Map> = Arc::new(RwLock::new(BTreeMap::new()));
 		macro_rules! build {
@@ -114,9 +117,9 @@ impl Services {
 		}))
 	}
 
-	pub async fn start(self: &Arc<Self>) -> Result<Arc<Self>> {
+	async fn start(self: &Arc<Self>) -> Result<Arc<Self>> {
 		debug_info!("Starting services...");
-
+		
 		self.admin.set_services(Some(Arc::clone(self)).as_ref());
 		super::migrations::migrations(self).await?;
 		self.manager
@@ -141,7 +144,7 @@ impl Services {
 		Ok(Arc::clone(self))
 	}
 
-	pub async fn stop(&self) {
+	async fn stop(&self) {
 		info!("Shutting down services...");
 
 		// set the server user as offline
@@ -162,7 +165,7 @@ impl Services {
 		debug_info!("Services shutdown complete.");
 	}
 
-	pub async fn poll(&self) -> Result<()> {
+	async fn poll(&self) -> Result<()> {
 		if let Some(manager) = self.manager.lock().await.as_ref() {
 			return manager.poll().await;
 		}
@@ -170,7 +173,7 @@ impl Services {
 		Ok(())
 	}
 
-	pub async fn clear_cache(&self) {
+	async fn clear_cache(&self) {
 		self.services()
 			.for_each(|service| async move {
 				service.clear_cache().await;
@@ -178,7 +181,7 @@ impl Services {
 			.await;
 	}
 
-	pub async fn memory_usage(&self) -> Result<String> {
+	async fn memory_usage(&self) -> Result<String> {
 		self.services()
 			.map(Ok)
 			.try_fold(String::new(), |mut out, service| async move {
@@ -211,19 +214,27 @@ impl Services {
 	}
 
 	#[inline]
-	pub fn try_get<T>(&self, name: &str) -> Result<Arc<T>>
+	fn try_get<T>(&self, name: &str) -> Result<Arc<T>>
 	where
 		T: Any + Send + Sync + Sized,
 	{
-		service::try_get::<T>(&self.service, name)
+		conduwuit_service::service::try_get::<T>(&self.service, name)
 	}
 
 	#[inline]
-	pub fn get<T>(&self, name: &str) -> Option<Arc<T>>
+	fn get<T>(&self, name: &str) -> Option<Arc<T>>
 	where
 		T: Any + Send + Sync + Sized,
 	{
-		service::get::<T>(&self.service, name)
+		conduwuit_service::service::get::<T>(&self.service, name)
+	}
+
+	fn server(&self) -> &Arc<Server> {
+		&self.server
+	}
+
+	fn service_map(&self) -> &Arc<Map> {
+		&self.service
 	}
 }
 
