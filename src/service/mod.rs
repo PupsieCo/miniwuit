@@ -17,6 +17,10 @@ pub use crate::services::ServicesTrait;
 pub use crate::manager::Manager;
 pub use crate::service::Args;
 pub use crate::service::Dep;
+pub use crate::service::Map;
+pub use crate::service::MapType;
+pub use crate::service::MapKey;
+pub use crate::service::MapVal;
 
 conduwuit::mod_ctor! {}
 conduwuit::mod_dtor! {}

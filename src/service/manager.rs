@@ -1,4 +1,5 @@
-use std::{panic::AssertUnwindSafe, sync::Arc, time::Duration};
+use std::{panic::AssertUnwindSafe, sync::Arc, time::Duration, marker::PhantomData};
+
 
 use conduwuit::{Err, Error, Result, Server, debug, debug_warn, error, trace, utils::time, warn};
 use futures::{FutureExt, TryFutureExt};
@@ -8,13 +9,15 @@ use tokio::{
 	time::sleep,
 };
 
-use crate::{Services, service, service::Service};
+use crate::{service, service::Service, ServicesTrait};
 
-pub struct Manager {
+pub struct Manager<S: ServicesTrait> {
 	manager: Mutex<Option<JoinHandle<Result<()>>>>,
 	workers: Mutex<Workers>,
 	server: Arc<Server>,
 	service: Arc<service::Map>,
+	_phantom: PhantomData<S>,
+	// services: Weak<S>
 }
 
 type Workers = JoinSet<WorkerResult>;
@@ -23,13 +26,14 @@ type WorkersLocked<'a> = MutexGuard<'a, Workers>;
 
 const RESTART_DELAY_MS: u64 = 2500;
 
-impl Manager {
-	pub fn new(services: &Services) -> Arc<Self> {
+impl<S: ServicesTrait> Manager<S> {
+	pub fn new(services: &Arc<S>) -> Arc<Self> {
 		Arc::new(Self {
 			manager: Mutex::new(None),
 			workers: Mutex::new(JoinSet::new()),
-			server: services.server.clone(),
-			service: services.service.clone(),
+			server: services.server().clone(),
+			service: services.service_map().clone(),
+			_phantom: PhantomData,
 		})
 	}
 

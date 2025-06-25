@@ -41,13 +41,16 @@ pub trait ServicesTrait: Any + Send + Sync {
 	fn get<T>(&self, name: &str) -> Option<Arc<T>>
 	where
 		T: Any + Send + Sync + Sized;
+	// Add these getter methods
+    fn server(&self) -> &Arc<Server>;
+    fn service_map(&self) -> &Arc<Map>;
 
 }
 
 
 pub struct Services {
 	pub config: Arc<config::Service>,
-	manager: Mutex<Option<Arc<Manager>>>,
+	manager: Mutex<Option<Arc<Manager<Self>>>>,
 	pub(crate) service: Arc<Map>,
 	pub server: Arc<Server>,
 	pub db: Arc<Database>,
@@ -192,6 +195,14 @@ impl ServicesTrait for Services {
 		T: Any + Send + Sync + Sized,
 	{
 		service::get::<T>(&self.service, name)
+	}
+
+	fn server(&self) -> &Arc<Server> {
+		&self.server
+	}
+
+	fn service_map(&self) -> &Arc<Map> {
+		&self.service
 	}
 }
 

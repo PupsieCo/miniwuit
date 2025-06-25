@@ -15,7 +15,7 @@ const SIGNAL: &str = "SIGUSR1";
 
 #[async_trait]
 impl crate::Service for Service {
-	fn build(args: crate::Args<'_>) -> Result<Arc<Self>> {
+	fn build(args: crate::service::Args<'_>) -> Result<Arc<Self>> {
 		Ok(Arc::new(Self { server: args.server.clone() }))
 	}
 
