@@ -10,7 +10,7 @@ use tokio::{
 
 use crate::{Services, service, service::Service};
 
-pub(crate) struct Manager {
+pub struct Manager {
 	manager: Mutex<Option<JoinHandle<Result<()>>>>,
 	workers: Mutex<Workers>,
 	server: Arc<Server>,
@@ -24,7 +24,7 @@ type WorkersLocked<'a> = MutexGuard<'a, Workers>;
 const RESTART_DELAY_MS: u64 = 2500;
 
 impl Manager {
-	pub(super) fn new(services: &Services) -> Arc<Self> {
+	pub fn new(services: &Services) -> Arc<Self> {
 		Arc::new(Self {
 			manager: Mutex::new(None),
 			workers: Mutex::new(JoinSet::new()),
@@ -33,7 +33,8 @@ impl Manager {
 		})
 	}
 
-	pub(super) async fn poll(&self) -> Result<()> {
+	pub async fn poll(&self) -> Result<()> {
+		debug!("Polling service manager...");
 		if let Some(manager) = &mut *self.manager.lock().await {
 			trace!("Polling service manager...");
 			return manager.await?;
@@ -42,7 +43,7 @@ impl Manager {
 		Ok(())
 	}
 
-	pub(super) async fn start(self: Arc<Self>) -> Result<()> {
+	pub async fn start(self: Arc<Self>) -> Result<()> {
 		let mut workers = self.workers.lock().await;
 
 		debug!("Starting service manager...");
@@ -72,7 +73,7 @@ impl Manager {
 		Ok(())
 	}
 
-	pub(super) async fn stop(&self) {
+	pub async fn stop(&self) {
 		if let Some(manager) = self.manager.lock().await.take() {
 			debug!("Waiting for service manager...");
 			if let Err(e) = manager.await {
