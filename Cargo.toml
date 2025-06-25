@@ -601,6 +601,11 @@ package = "conduwuit_router"
 path = "src/router"
 default-features = false
 
+[workspace.dependencies.conduwuit-service]
+package = "conduwuit_service"
+path = "src/service"
+default-features = false
+
 [workspace.dependencies.conduwuit-social-admin]
 package = "conduwuit_social_admin"
 path = "src/social-admin"

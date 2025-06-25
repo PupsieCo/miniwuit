@@ -1487,6 +1487,7 @@ dependencies = [
  "bytes",
  "conduwuit_core",
  "conduwuit_database",
+ "conduwuit_service",
  "const-str",
  "either",
  "futures",
