@@ -28,6 +28,7 @@ release_max_log_level = [
 clap.workspace = true
 conduwuit-social-api.workspace = true
 conduwuit-core.workspace = true
+conduwuit-service.workspace = true
 conduwuit-database.workspace = true
 conduwuit-social-macros.workspace = true
 conduwuit-social-service.workspace = true

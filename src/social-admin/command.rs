@@ -1,6 +1,7 @@
 use std::{fmt, time::SystemTime};
 
 use conduwuit::Result;
+use conduwuit_service::services::ServicesTrait;
 use conduwuit_social_service::Services;
 use futures::{
 	Future, FutureExt,
