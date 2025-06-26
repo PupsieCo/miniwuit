@@ -185,23 +185,6 @@ impl ServicesTrait for Services {
 			.stream()
 	}
 
-	async fn memory_usage(&self) -> Result<String> {
-        <Self as ServicesTrait>::memory_usage(self).await
-    }
-    
-    /// Convenience method - available without importing trait  
-    async fn clear_cache(&self) {
-        <Self as ServicesTrait>::clear_cache(self).await
-    }
-    
-    fn interrupt(&self) {
-        <Self as ServicesTrait>::interrupt(self)
-    }
-
-	// fn services(&self) -> Result<impl Stream<Item = Arc<dyn Service>> + Send>{
-	// 	<Self as ServicesTrait>::services(self)
-	// }
-
 	#[inline]
 	fn try_get<T>(&self, name: &str) -> Result<Arc<T>>
 	where
