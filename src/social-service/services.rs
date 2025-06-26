@@ -173,35 +173,7 @@ impl ServicesTrait for Services {
 		Ok(())
 	}
 
-	async fn clear_cache(&self) {
-		self.services()
-			.for_each(|service| async move {
-				service.clear_cache().await;
-			})
-			.await;
-	}
-
-	async fn memory_usage(&self) -> Result<String> {
-		self.services()
-			.map(Ok)
-			.try_fold(String::new(), |mut out, service| async move {
-				service.memory_usage(&mut out).await?;
-				Ok(out)
-			})
-			.await
-	}
-
-	fn interrupt(&self) {
-		debug!("Interrupting services...");
-		for (name, (service, ..)) in self.service.read().expect("locked for reading").iter() {
-			if let Some(service) = service.upgrade() {
-				trace!("Interrupting {name}");
-				service.interrupt();
-			}
-		}
-	}
-
-	/// Iterate from snapshot of the services map
+	// /// Iterate from snapshot of the services map
 	fn services(&self) -> impl Stream<Item = Arc<dyn Service>> + Send {
 		self.service
 			.read()
@@ -212,6 +184,23 @@ impl ServicesTrait for Services {
 			.into_iter()
 			.stream()
 	}
+
+	async fn memory_usage(&self) -> Result<String> {
+        <Self as ServicesTrait>::memory_usage(self).await
+    }
+    
+    /// Convenience method - available without importing trait  
+    async fn clear_cache(&self) {
+        <Self as ServicesTrait>::clear_cache(self).await
+    }
+    
+    fn interrupt(&self) {
+        <Self as ServicesTrait>::interrupt(self)
+    }
+
+	// fn services(&self) -> Result<impl Stream<Item = Arc<dyn Service>> + Send>{
+	// 	<Self as ServicesTrait>::services(self)
+	// }
 
 	#[inline]
 	fn try_get<T>(&self, name: &str) -> Result<Arc<T>>
@@ -235,6 +224,19 @@ impl ServicesTrait for Services {
 
 	fn service_map(&self) -> &Arc<Map> {
 		&self.service
+	}
+
+
+	fn config(&self) -> &Arc<config::Service> {
+		&self.config
+	}
+
+	fn db(&self) -> &Arc<Database> {
+		&self.db
+	}
+
+	fn manager(&self) -> Option<&Mutex<Option<Arc<Manager<Self>>>>> {
+		Some(&self.manager)
 	}
 }
 

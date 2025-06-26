@@ -10,7 +10,8 @@ use std::{
 use axum_server::Handle as ServerHandle;
 use conduwuit::{Error, Result, Server, debug, debug_error, debug_info, error, info};
 use futures::FutureExt;
-use service::Services;
+// use service::Services;
+use conduwuit_service::services::{Services, ServicesTrait};
 use tokio::{
 	sync::broadcast::{self, Sender},
 	task::JoinHandle,

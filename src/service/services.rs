@@ -21,19 +21,61 @@ use crate::{
 #[async_trait]
 pub trait ServicesTrait: Any + Send + Sync {
 	type Services: ServicesTrait;
-	async fn build(server: Arc<Server>) -> Result<Arc<Self>>
-	where
-		Self: Sized;
 
+	// Core methods that need to be implemented
+	fn server(&self) -> &Arc<Server>;
+	fn service_map(&self) -> &Arc<Map>;
+	fn config(&self) -> &Arc<config::Service>;
+	fn db(&self) -> &Arc<Database>;
+	fn manager(&self) -> Option<&Mutex<Option<Arc<Manager<Self>>>>> where Self: Sized { None }
+
+	// Methods with default implementations
+	async fn clear_cache(&self) {
+		self.services()
+			.for_each(|service| async move {
+				service.clear_cache().await;
+			})
+			.await;
+	}
+
+	async fn memory_usage(&self) -> Result<String> {
+		self.services()
+			.map(Ok)
+			.try_fold(String::new(), |mut out, service| async move {
+				service.memory_usage(&mut out).await?;
+				Ok(out)
+			})
+			.await
+	}
+
+	fn interrupt(&self) {
+		debug!("Interrupting services...");
+		for (name, (service, ..)) in self.service_map().read().expect("locked for reading").iter() {
+			if let Some(service) = service.upgrade() {
+				trace!("Interrupting {name}");
+				service.interrupt();
+			}
+		}
+	}
+
+	// Iterate from snapshot of the services map
+	fn services(&self) -> impl Stream<Item = Arc<dyn Service>> + Send {
+		self.service_map()
+			.read()
+			.expect("locked for reading")
+			.values()
+			.filter_map(|val| val.0.upgrade())
+			.collect::<Vec<_>>()
+			.into_iter()
+			.stream()
+	}
+
+	// Abstract methods that need to be implemented
+	async fn build(server: Arc<Server>) -> Result<Arc<Self>> where Self: Sized;
 	async fn start(self: &Arc<Self>) -> Result<Arc<Self::Services>>;
-
 	async fn stop(&self);
 	async fn poll(&self) -> Result<()>;
-	async fn clear_cache(&self);
-	async fn memory_usage(&self) -> Result<String>;
-	fn interrupt(&self);
 
-	fn services(&self) -> impl Stream<Item = Arc<dyn Service>> + Send;
 	fn try_get<T>(&self, name: &str) -> Result<Arc<T>>
 	where
 		T: Any + Send + Sync + Sized;
@@ -41,17 +83,13 @@ pub trait ServicesTrait: Any + Send + Sync {
 	fn get<T>(&self, name: &str) -> Option<Arc<T>>
 	where
 		T: Any + Send + Sync + Sized;
-	// Add these getter methods
-    fn server(&self) -> &Arc<Server>;
-    fn service_map(&self) -> &Arc<Map>;
-
 }
 
 
 pub struct Services {
 	pub config: Arc<config::Service>,
 	manager: Mutex<Option<Arc<Manager<Self>>>>,
-	pub(crate) service: Arc<Map>,
+	pub(crate) service_map: Arc<Map>,
 	pub server: Arc<Server>,
 	pub db: Arc<Database>,
 }
@@ -63,15 +101,15 @@ impl ServicesTrait for Services {
 	#[allow(clippy::cognitive_complexity)]
 	async fn build(server: Arc<Server>) -> Result<Arc<Self>> {
 		let db = Database::open(&server).await?;
-		let service: Arc<Map> = Arc::new(RwLock::new(BTreeMap::new()));
+		let service_map: Arc<Map> = Arc::new(RwLock::new(BTreeMap::new()));
 		macro_rules! build {
 			($tyname:ty) => {{
 				let built = <$tyname>::build(Args {
 					db: &db,
 					server: &server,
-					service: &service,
+					service: &service_map,
 				})?;
-				add_service(&service, built.clone(), built.clone());
+				add_service(&service_map, built.clone(), built.clone());
 				built
 			}};
 		}
@@ -79,7 +117,7 @@ impl ServicesTrait for Services {
 		Ok(Arc::new(Self {
 			config: build!(config::Service),
 			manager: Mutex::new(None),
-			service,
+			service_map,
 			server,
 			db,
 		}))
@@ -141,52 +179,12 @@ impl ServicesTrait for Services {
 		Ok(())
 	}
 
-	async fn clear_cache(&self) {
-		self.services()
-			.for_each(|service| async move {
-				service.clear_cache().await;
-			})
-			.await;
-	}
-
-	async fn memory_usage(&self) -> Result<String> {
-		self.services()
-			.map(Ok)
-			.try_fold(String::new(), |mut out, service| async move {
-				service.memory_usage(&mut out).await?;
-				Ok(out)
-			})
-			.await
-	}
-
-	fn interrupt(&self) {
-		debug!("Interrupting services...");
-		for (name, (service, ..)) in self.service.read().expect("locked for reading").iter() {
-			if let Some(service) = service.upgrade() {
-				trace!("Interrupting {name}");
-				service.interrupt();
-			}
-		}
-	}
-
-	/// Iterate from snapshot of the services map
-	fn services(&self) -> impl Stream<Item = Arc<dyn Service>> + Send {
-		self.service
-			.read()
-			.expect("locked for reading")
-			.values()
-			.filter_map(|val| val.0.upgrade())
-			.collect::<Vec<_>>()
-			.into_iter()
-			.stream()
-	}
-
 	#[inline]
 	fn try_get<T>(&self, name: &str) -> Result<Arc<T>>
 	where
 		T: Any + Send + Sync + Sized,
 	{
-		service::try_get::<T>(&self.service, name)
+		service::try_get::<T>(&self.service_map(), name)
 	}
 
 	#[inline]
@@ -194,7 +192,7 @@ impl ServicesTrait for Services {
 	where
 		T: Any + Send + Sync + Sized,
 	{
-		service::get::<T>(&self.service, name)
+		service::get::<T>(&self.service_map(), name)
 	}
 
 	fn server(&self) -> &Arc<Server> {
@@ -202,7 +200,19 @@ impl ServicesTrait for Services {
 	}
 
 	fn service_map(&self) -> &Arc<Map> {
-		&self.service
+		&self.service_map
+	}
+
+	fn config(&self) -> &Arc<config::Service> {
+		&self.config
+	}
+
+	fn db(&self) -> &Arc<Database> {
+		&self.db
+	}
+
+	fn manager(&self) -> Option<&Mutex<Option<Arc<Manager<Self>>>>> {
+		Some(&self.manager)
 	}
 }
 
