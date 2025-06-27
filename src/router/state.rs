@@ -1,6 +1,6 @@
 use std::{ops::Deref, sync::Arc};
 
-use conduwuit_service::Services;
+use conduwuit_service::ServicesTrait as Services;
 
 #[derive(Clone, Copy)]
 pub struct State {
@@ -8,10 +8,10 @@ pub struct State {
 }
 
 pub struct Guard {
-	services: Arc<Services>,
+	services: Arc<dyn Services>,
 }
 
-pub fn create(services: Arc<Services>) -> (State, Guard) {
+pub fn create(services: Arc<dyn Services>) -> (State, Guard) {
 	let state = State {
 		services: Arc::into_raw(services.clone()),
 	};
@@ -35,7 +35,7 @@ impl Drop for Guard {
 }
 
 impl Deref for State {
-	type Target = Services;
+	type Target = dyn Services;
 
 	fn deref(&self) -> &Self::Target {
 		deref(&self.services).expect("dereferenced Services pointer in State must not be null")
@@ -52,7 +52,7 @@ unsafe impl Send for State {}
 /// additional fields this notice should be reevaluated.
 unsafe impl Sync for State {}
 
-fn deref(services: &*const Services) -> Option<&Services> {
+fn deref(services: &*const dyn Services) -> Option<&dyn Services> {
 	// SAFETY: We replaced Arc<Services> with *const Services in State. This is
 	// worth about 10 clones (20 reference count updates) for each request handled.
 	// Though this is not an incredibly large quantity, it's woefully unnecessary
