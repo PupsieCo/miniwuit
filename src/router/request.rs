@@ -9,7 +9,7 @@ use axum::{
 	response::{IntoResponse, Response},
 };
 use conduwuit::{Result, debug, debug_error, debug_warn, err, error, trace};
-use conduwuit_social_service::Services;
+use conduwuit_service::Services;
 use futures::FutureExt;
 use http::{Method, StatusCode, Uri};
 use tokio::time::sleep;

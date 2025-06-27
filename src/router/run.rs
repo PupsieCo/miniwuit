@@ -1,6 +1,6 @@
-extern crate conduwuit_social_admin as admin;
+// extern crate conduwuit_social_admin as admin;
 extern crate conduwuit_core as conduwuit;
-extern crate conduwuit_social_service as service;
+extern crate conduwuit_service as service;
 
 use std::{
 	sync::{Arc, Weak, atomic::Ordering},
@@ -26,7 +26,7 @@ pub(crate) async fn run(services: Arc<Services>) -> Result<()> {
 	debug!("Start");
 
 	// Install the admin room callback here for now
-	admin::init(&services.admin).await;
+	// admin::init(&services.admin).await;
 
 	// Setup shutdown/signal handling
 	let handle = ServerHandle::new();
@@ -52,7 +52,7 @@ pub(crate) async fn run(services: Arc<Services>) -> Result<()> {
 	_ = sigs.await;
 
 	// Remove the admin room callback
-	admin::fini(&services.admin).await;
+	// admin::fini(&services.admin).await;
 
 	debug_info!("Finish");
 	res

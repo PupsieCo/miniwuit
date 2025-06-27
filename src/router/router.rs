@@ -2,8 +2,9 @@ use std::sync::Arc;
 
 use axum::{Router, response::IntoResponse, routing::get};
 use conduwuit::Error;
-use conduwuit_social_api::router::{state, state::Guard};
-use conduwuit_social_service::Services;
+// use conduwuit_social_api::router::{state, state::Guard};
+use crate::state::{state, state::Guard};
+use conduwuit_service::Services;
 use http::{StatusCode, Uri};
 use ruma::api::client::error::ErrorKind;
 
