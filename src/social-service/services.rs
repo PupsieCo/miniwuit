@@ -1,21 +1,21 @@
+use async_trait::async_trait;
+use conduwuit::{Result, Server, debug, debug_info, info, trace, utils::stream::IterStream};
+use database::Database;
+use futures::{Stream, StreamExt, TryStreamExt};
 use std::{
 	any::Any,
 	collections::BTreeMap,
 	sync::{Arc, RwLock},
 };
-use async_trait::async_trait;
-use conduwuit::{Result, Server, debug, debug_info, info, trace, utils::stream::IterStream};
-use database::Database;
-use futures::{Stream, StreamExt, TryStreamExt};
 use tokio::sync::Mutex;
 
 use crate::{
-	account_data, admin, appservice, client, emergency, federation, globals, key_backups,
-	media, presence, pusher, resolver, rooms, sending, server_keys,
-	sync, transaction_ids, uiaa, updates, users,
+	account_data, admin, appservice, client, emergency, federation, globals, key_backups, media,
+	presence, pusher, resolver, rooms, sending, server_keys, sync, transaction_ids, uiaa,
+	updates, users,
 };
 
-use conduwuit_service::{Args, Map, Service, Manager, ServicesTrait, config};
+use conduwuit_service::{Args, Manager, Map, Service, ServicesTrait, config};
 
 pub struct Services {
 	pub account_data: Arc<account_data::Service>,
@@ -48,10 +48,11 @@ pub struct Services {
 
 #[async_trait]
 impl ServicesTrait for Services {
-	type Services = Self;
+	// type Services = Self;
+	type BuildResult = Arc<Self>;
 
 	#[allow(clippy::cognitive_complexity)]
-	async fn build(server: Arc<Server>) -> Result<Arc<Self>> {
+	async fn start(server: Arc<Server>) -> Result<Arc<Self>> {
 		let db = Database::open(&server).await?;
 		let service: Arc<Map> = Arc::new(RwLock::new(BTreeMap::new()));
 		macro_rules! build {
@@ -66,7 +67,7 @@ impl ServicesTrait for Services {
 			}};
 		}
 
-		Ok(Arc::new(Self {
+		let built = Arc::new(Self {
 			account_data: build!(account_data::Service),
 			admin: build!(admin::Service),
 			appservice: build!(appservice::Service),
@@ -114,34 +115,33 @@ impl ServicesTrait for Services {
 			service,
 			server,
 			db,
-		}))
-	}
+		});
 
-	async fn start(self: &Arc<Self>) -> Result<Arc<Self>> {
 		debug_info!("Starting services...");
-		
-		self.admin.set_services(Some(Arc::clone(self)).as_ref());
-		super::migrations::migrations(self).await?;
-		self.manager
+
+		built.admin.set_services(Some(Arc::clone(&built)).as_ref());
+		super::migrations::migrations(&built).await?;
+		built
+			.manager
 			.lock()
 			.await
-			.insert(Manager::new(self))
+			.insert(Manager::new(&built))
 			.clone()
 			.start()
 			.await?;
 
 		// reset dormant online/away statuses to offline, and set the server user as
 		// online
-		if self.server.config.allow_local_presence && !self.db.is_read_only() {
-			self.presence.unset_all_presence().await;
-			_ = self
+		if built.server.config.allow_local_presence && !built.db.is_read_only() {
+			built.presence.unset_all_presence().await;
+			_ = built
 				.presence
-				.ping_presence(&self.globals.server_user, &ruma::presence::PresenceState::Online)
+				.ping_presence(&built.globals.server_user, &ruma::presence::PresenceState::Online)
 				.await;
 		}
 
 		debug_info!("Services startup complete.");
-		Ok(Arc::clone(self))
+		Ok(built)
 	}
 
 	async fn stop(&self) {
@@ -185,42 +185,42 @@ impl ServicesTrait for Services {
 			.stream()
 	}
 
-	#[inline]
-	fn try_get<T>(&self, name: &str) -> Result<Arc<T>>
-	where
-		T: Any + Send + Sync + Sized,
-	{
-		conduwuit_service::service::try_get::<T>(&self.service, name)
+	// #[inline]
+	// fn try_get<T>(&self, name: &str) -> Result<Arc<T>>
+	// where
+	// 	T: Any + Send + Sync + Sized,
+	// {
+	// 	conduwuit_service::service::try_get::<T>(&self.service, name)
+	// }
+	//
+	// #[inline]
+	// fn get<T>(&self, name: &str) -> Option<Arc<T>>
+	// where
+	// 	T: Any + Send + Sync + Sized,
+	// {
+	// 	conduwuit_service::service::get::<T>(&self.service, name)
+	// }
+
+	fn server(&self) -> Arc<Server> {
+		self.server.clone()
 	}
 
-	#[inline]
-	fn get<T>(&self, name: &str) -> Option<Arc<T>>
-	where
-		T: Any + Send + Sync + Sized,
-	{
-		conduwuit_service::service::get::<T>(&self.service, name)
+	fn service_map(&self) -> Arc<Map> {
+		self.service.clone()
 	}
 
-	fn server(&self) -> &Arc<Server> {
-		&self.server
-	}
-
-	fn service_map(&self) -> &Arc<Map> {
-		&self.service
-	}
-
-
-	fn config(&self) -> &Arc<config::Service> {
-		&self.config
-	}
-
-	fn db(&self) -> &Arc<Database> {
-		&self.db
-	}
-
-	fn manager(&self) -> Option<&Mutex<Option<Arc<Manager<Self>>>>> {
-		Some(&self.manager)
-	}
+	//
+	// fn config(&self) -> &Arc<config::Service> {
+	// 	&self.config
+	// }
+	//
+	// fn db(&self) -> &Arc<Database> {
+	// 	&self.db
+	// }
+	//
+	// fn manager(&self) -> Option<&Mutex<Option<Arc<Manager<Self>>>>> {
+	// 	Some(&self.manager)
+	// }
 }
 
 #[allow(clippy::needless_pass_by_value)]

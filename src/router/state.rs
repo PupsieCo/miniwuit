@@ -1,17 +1,16 @@
 use std::{ops::Deref, sync::Arc};
-
-use conduwuit_service::ServicesTrait as Services;
+use conduwuit_service::ServicesTrait;
 
 #[derive(Clone, Copy)]
-pub struct State {
-	services: *const Services,
+pub struct State<S: ServicesTrait> {
+	services: *const S,
 }
 
-pub struct Guard {
-	services: Arc<dyn Services>,
+pub struct Guard<S: ServicesTrait> {
+	services: Arc<S>,
 }
 
-pub fn create(services: Arc<dyn Services>) -> (State, Guard) {
+pub fn create<S: ServicesTrait>(services: Arc<S>) -> (State<S>, Guard<S>) {
 	let state = State {
 		services: Arc::into_raw(services.clone()),
 	};
@@ -21,7 +20,7 @@ pub fn create(services: Arc<dyn Services>) -> (State, Guard) {
 	(state, guard)
 }
 
-impl Drop for Guard {
+impl<S: ServicesTrait> Drop for Guard<S> {
 	fn drop(&mut self) {
 		let ptr = Arc::as_ptr(&self.services);
 		// SAFETY: Parity with Arc::into_raw() called in create(). This revivifies the
@@ -34,8 +33,8 @@ impl Drop for Guard {
 	}
 }
 
-impl Deref for State {
-	type Target = dyn Services;
+impl<S: ServicesTrait> Deref for State<S> {
+	type Target = S;
 
 	fn deref(&self) -> &Self::Target {
 		deref(&self.services).expect("dereferenced Services pointer in State must not be null")
@@ -45,14 +44,14 @@ impl Deref for State {
 /// SAFETY: State is a thin wrapper containing a raw const pointer to Services
 /// in lieu of an Arc. Services is internally threadsafe. If State contains
 /// additional fields this notice should be reevaluated.
-unsafe impl Send for State {}
+unsafe impl<S: ServicesTrait> Send for State<S> {}
 
 /// SAFETY: State is a thin wrapper containing a raw const pointer to Services
 /// in lieu of an Arc. Services is internally threadsafe. If State contains
 /// additional fields this notice should be reevaluated.
-unsafe impl Sync for State {}
+unsafe impl<S: ServicesTrait> Sync for State<S> {}
 
-fn deref(services: &*const dyn Services) -> Option<&dyn Services> {
+fn deref<S: ServicesTrait>(services: &*const S) -> Option<&S> {
 	// SAFETY: We replaced Arc<Services> with *const Services in State. This is
 	// worth about 10 clones (20 reference count updates) for each request handled.
 	// Though this is not an incredibly large quantity, it's woefully unnecessary

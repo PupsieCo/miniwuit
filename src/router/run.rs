@@ -65,8 +65,8 @@ pub(crate) async fn run(core_services: Arc<CoreServices>, social_services: Arc<S
 pub(crate) async fn start(server: Arc<Server>) -> Result<(Arc<CoreServices>, Arc<SocialServices>)> {
 	debug!("Starting...");
 
-	let core_services = CoreServices::build(server).await?.start().await?;
-	let social_services = SocialServices::build(server).await?.start().await?;
+	let core_services = CoreServices::start(server).await?.start().await?;
+	let social_services = SocialServices::start(server).await?.start().await?;
 
 	#[cfg(all(feature = "systemd", target_os = "linux"))]
 	sd_notify::notify(true, &[sd_notify::NotifyState::Ready])

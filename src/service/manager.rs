@@ -31,8 +31,8 @@ impl<S: ServicesTrait> Manager<S> {
 		Arc::new(Self {
 			manager: Mutex::new(None),
 			workers: Mutex::new(JoinSet::new()),
-			server: services.server().clone(),
-			service: services.service_map().clone(),
+			server: services.server(),
+			service: services.service_map(),
 			_phantom: PhantomData,
 		})
 	}
