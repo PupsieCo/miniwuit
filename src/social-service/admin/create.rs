@@ -25,7 +25,7 @@ use crate::Services;
 /// used to issue admin commands by talking to the server user inside it.
 pub async fn create_admin_room(services: &Services) -> Result {
 	let room_id = RoomId::new(services.globals.server_name());
-	let room_version = &services.config.default_room_version;
+	let room_version = &services.server.config.default_room_version;
 
 	let _short_id = services
 		.rooms
@@ -140,7 +140,7 @@ pub async fn create_admin_room(services: &Services) -> Result {
 		.await?;
 
 	// 5. Events implied by name and topic
-	let room_name = format!("{} Admin Room", services.config.server_name);
+	let room_name = format!("{} Admin Room", services.server.config.server_name);
 	services
 		.rooms
 		.timeline
@@ -157,7 +157,7 @@ pub async fn create_admin_room(services: &Services) -> Result {
 		.timeline
 		.build_and_append_pdu(
 			PduBuilder::state(String::new(), &RoomTopicEventContent {
-				topic: format!("Manage {} | Run commands prefixed with `!admin` | Run `!admin -h` for help | Documentation: https://conduwuit.puppyirl.gay/", services.config.server_name),
+				topic: format!("Manage {} | Run commands prefixed with `!admin` | Run `!admin -h` for help | Documentation: https://conduwuit.puppyirl.gay/", services.server.config.server_name),
 			}),
 			server_user,
 			&room_id,
