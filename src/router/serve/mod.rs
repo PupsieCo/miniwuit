@@ -7,7 +7,7 @@ use std::sync::Arc;
 
 use axum_server::Handle as ServerHandle;
 use conduwuit::{Result, err};
-use conduwuit_social_service::Services;
+use conduwuit_service::Services;
 use tokio::sync::broadcast;
 
 use super::layers;

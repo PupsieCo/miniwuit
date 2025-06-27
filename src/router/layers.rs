@@ -6,8 +6,8 @@ use axum::{
 };
 use axum_client_ip::SecureClientIpSource;
 use conduwuit::{Result, Server, debug, error};
-use conduwuit_social_api::router::state::Guard;
-use conduwuit_social_service::Services;
+use crate::state::Guard;
+use conduwuit_service::Services;
 use http::{
 	HeaderValue, Method, StatusCode,
 	header::{self, HeaderName},

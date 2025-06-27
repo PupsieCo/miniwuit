@@ -5,13 +5,14 @@ mod request;
 mod router;
 mod run;
 mod serve;
+mod state;
 
 extern crate conduwuit_core as conduwuit;
 
 use std::{panic::AssertUnwindSafe, pin::Pin, sync::Arc};
 
 use conduwuit::{Error, Result, Server};
-use conduwuit_social_service::Services;
+use conduwuit_service::Services;
 use futures::{Future, FutureExt, TryFutureExt};
 
 conduwuit::mod_ctor! {}
