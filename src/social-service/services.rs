@@ -72,7 +72,7 @@ impl ServicesTrait for Services {
 			appservice: build!(appservice::Service),
 			resolver: build!(resolver::Service),
 			client: build!(client::Service),
-			config: build!(config::Service),
+			config: Arc::new(server.core_services.config.clone()),//build!(config::Service),
 			emergency: build!(emergency::Service),
 			globals: build!(globals::Service),
 			key_backups: build!(key_backups::Service),
