@@ -16,7 +16,9 @@ pub(crate) struct Server {
 	/// Server runtime state; public portion
 	pub(crate) server: Arc<conduwuit_core::Server>,
 
-	pub(crate) services: Mutex<Option<Arc<conduwuit_social_service::Services>>>,
+	pub(crate) core_services: Mutex<Option<Arc<conduwuit_service::Services>>>,
+
+	pub(crate) social_services: Mutex<Option<Arc<conduwuit_social_service::Services>>>,
 
 	_tracing_flame_guard: TracingFlameGuard,
 
@@ -75,7 +77,8 @@ impl Server {
 				capture,
 			})),
 
-			services: None.into(),
+			core_services: None.into(),
+			social_services: None.into(),
 
 			_tracing_flame_guard: tracing_flame_guard,
 

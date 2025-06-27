@@ -25,8 +25,9 @@ type StopFuncProto = fn(Arc<Services>) -> StopFuncResult;
 
 const RESTART_THRESH: &str = "conduwuit_social_service";
 const MODULE_NAMES: &[&str] = &[
-	//"conduwuit_core",
+	"conduwuit_core",
 	"conduwuit_database",
+	"conduwuit_service",
 	"conduwuit_social_service",
 	"conduwuit_social_api",
 	"conduwuit_social_admin",
@@ -44,7 +45,10 @@ pub(crate) async fn run(server: &Arc<Server>, starts: bool) -> Result<(bool, boo
 	if starts {
 		let start = main_mod.get::<StartFuncProto>("start")?;
 		match start(&server.server).await {
-			| Ok(services) => server.services.lock().await.insert(services),
+			| Ok((core_services, social_services)) => {
+				server.core_services.lock().await.insert(core_services);
+				server.social_services.lock().await.insert(social_services);
+			},
 			| Err(error) => {
 				error!("Starting server: {error}");
 				return Err(error);
@@ -53,12 +57,19 @@ pub(crate) async fn run(server: &Arc<Server>, starts: bool) -> Result<(bool, boo
 	}
 	server.server.stopping.store(false, Ordering::Release);
 	let run = main_mod.get::<RunFuncProto>("run")?;
-	if let Err(error) = run(server
-		.services
-		.lock()
-		.await
-		.as_ref()
-		.expect("services initialized"))
+	if let Err(error) = run(
+		server
+			.core_services
+			.lock()
+			.await
+			.as_ref()
+			.expect("core services initialized"),
+		server
+			.social_services
+			.lock()
+			.await
+			.as_ref()
+			.expect("social services initialized"),
 	.await
 	{
 		error!("Running server: {error}");
@@ -71,11 +82,17 @@ pub(crate) async fn run(server: &Arc<Server>, starts: bool) -> Result<(bool, boo
 		let stop = main_mod.get::<StopFuncProto>("stop")?;
 		if let Err(error) = stop(
 			server
-				.services
+				.core_services
 				.lock()
 				.await
 				.take()
-				.expect("services initialized"),
+				.expect("core services initialized"),
+			server
+				.social_services
+				.lock()
+				.await
+				.take()
+				.expect("social services initialized"),
 		)
 		.await
 		{

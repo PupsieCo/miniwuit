@@ -7,7 +7,8 @@ use axum::{
 use axum_client_ip::SecureClientIpSource;
 use conduwuit::{Result, Server, debug, error};
 use crate::state::Guard;
-use conduwuit_service::Services;
+use conduwuit_service::Services as CoreServices;
+use conduwuit_social_service::Services as SocialServices;
 use http::{
 	HeaderValue, Method, StatusCode,
 	header::{self, HeaderName},
@@ -35,8 +36,8 @@ const CONDUWUIT_CSP: &[&str; 5] = &[
 
 const CONDUWUIT_PERMISSIONS_POLICY: &[&str; 2] = &["interest-cohort=()", "browsing-topics=()"];
 
-pub(crate) fn build(services: &Arc<Services>) -> Result<(Router, Guard)> {
-	let server = &services.server;
+pub(crate) fn build((core_services, social_services): (Arc<CoreServices>, Arc<SocialServices>)) -> Result<(Router, Guard)> {
+	let server = &core_services.server;
 	let layers = ServiceBuilder::new();
 
 	#[cfg(feature = "sentry_telemetry")]
@@ -49,7 +50,8 @@ pub(crate) fn build(services: &Arc<Services>) -> Result<(Router, Guard)> {
 	))]
 	let layers = layers.layer(compression_layer(server));
 
-	let services_ = services.clone();
+	let core_services_ = core_services.clone();
+	let social_services_ = social_services.clone();
 	let layers = layers
 		.layer(SetSensitiveHeadersLayer::new([header::AUTHORIZATION]))
 		.layer(
@@ -59,7 +61,8 @@ pub(crate) fn build(services: &Arc<Services>) -> Result<(Router, Guard)> {
 				.on_request(DefaultOnRequest::new().level(Level::TRACE))
 				.on_response(DefaultOnResponse::new().level(Level::DEBUG)),
 		)
-		.layer(axum::middleware::from_fn_with_state(Arc::clone(services), request::handle))
+		.layer(axum::middleware::from_fn_with_state(Arc::clone(core_services), request::handle))
+		.layer(axum::middleware::from_fn_with_state(Arc::clone(social_services), request::handle))
 		.layer(SecureClientIpSource::ConnectInfo.into_extension())
 		.layer(ResponseBodyTimeoutLayer::new(Duration::from_secs(
 			server.config.client_response_timeout,
@@ -94,9 +97,9 @@ pub(crate) fn build(services: &Arc<Services>) -> Result<(Router, Guard)> {
 		))
 		.layer(cors_layer(server))
 		.layer(body_limit_layer(server))
-		.layer(CatchPanicLayer::custom(move |panic| catch_panic(panic, services_.clone())));
+		.layer(CatchPanicLayer::custom(move |panic| catch_panic(panic, social_services_.clone())));
 
-	let (router, guard) = router::build(services);
+	let (router, guard) = router::build((core_services_, social_services_));
 	Ok((router.layer(layers), guard))
 }
 
@@ -172,9 +175,9 @@ fn body_limit_layer(server: &Server) -> DefaultBodyLimit {
 #[allow(clippy::needless_pass_by_value)]
 fn catch_panic(
 	err: Box<dyn Any + Send + 'static>,
-	services: Arc<Services>,
+	social_services: Arc<SocialServices>,
 ) -> http::Response<http_body_util::Full<bytes::Bytes>> {
-	services
+	social_services
 		.server
 		.metrics
 		.requests_panic

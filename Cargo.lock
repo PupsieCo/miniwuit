@@ -1354,6 +1354,7 @@ dependencies = [
  "bytes",
  "conduwuit_core",
  "conduwuit_service",
+ "conduwuit_social_service",
  "const-str",
  "futures",
  "http 1.3.1",
