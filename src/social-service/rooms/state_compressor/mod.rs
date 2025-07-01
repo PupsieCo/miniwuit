@@ -22,7 +22,7 @@ use crate::{
 	rooms::short::{ShortEventId, ShortId, ShortStateHash, ShortStateKey},
 };
 
-use conduwuit_service::{Dep, Args, Service as ServiceTrait};
+use service_core::{Dep, Args, Service as ServiceTrait};
 
 pub struct Service {
 	pub stateinfo_cache: Mutex<StateInfoLruCache>,
@@ -114,7 +114,7 @@ impl ServiceTrait for Service {
 
 	async fn clear_cache(&self) { self.stateinfo_cache.lock().expect("locked").clear(); }
 
-	fn name(&self) -> &str { conduwuit_service::service::make_name(std::module_path!()) }
+	fn name(&self) -> &str { service_core::service::make_name(std::module_path!()) }
 }
 
 impl Service {

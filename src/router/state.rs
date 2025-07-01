@@ -1,10 +1,17 @@
+use service::ServicesTrait;
 use std::{ops::Deref, sync::Arc};
-use conduwuit_service::ServicesTrait;
 
-#[derive(Clone, Copy)]
 pub struct State<S: ServicesTrait> {
 	services: *const S,
 }
+
+impl<S: ServicesTrait> Clone for State<S> {
+	fn clone(&self) -> Self {
+		Self { services: self.services }
+	}
+}
+
+impl<S: ServicesTrait> Copy for State<S> {}
 
 pub struct Guard<S: ServicesTrait> {
 	services: Arc<S>,

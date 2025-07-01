@@ -10,7 +10,7 @@ use ruma::{UInt, UserId, events::presence::PresenceEvent, presence::PresenceStat
 
 use super::Presence;
 use crate::{globals, users};
-use conduwuit_service::{Dep, Args};
+use service_core::{Dep, Args};
 
 pub(crate) struct Data {
 	presenceid_presence: Arc<Map>,

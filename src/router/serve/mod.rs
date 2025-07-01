@@ -7,20 +7,17 @@ use std::sync::Arc;
 
 use axum_server::Handle as ServerHandle;
 use conduwuit::{Result, err};
-use conduwuit_service::Services as CoreServices;
-use conduwuit_social_service::Services as SocialServices;
 use tokio::sync::broadcast;
-
-use super::layers;
+use service::ServicesTrait;
+use super::{layers, RouterServices};
 
 /// Serve clients
-pub(super) async fn serve(
-	core_services: Arc<CoreServices>,
-	social_services: Arc<SocialServices>,
+pub(super) async fn serve<R: RouterServices + Clone>(
+	services: R,
 	handle: ServerHandle,
 	mut shutdown: broadcast::Receiver<()>,
 ) -> Result {
-	let server = &core_services.server;
+	let server = &services.server();
 	let config = &server.config;
 	if !config.listening {
 		return shutdown
@@ -30,7 +27,7 @@ pub(super) async fn serve(
 	}
 
 	let addrs = config.get_bind_addrs();
-	let (app, _guard) = layers::build((core_services, social_services))?;
+	let (app, _guard) = layers::build(services)?;
 	if cfg!(unix) && config.unix_socket_path.is_some() {
 		unix::serve(server, app, shutdown).await
 	} else if config.tls.certs.is_some() {

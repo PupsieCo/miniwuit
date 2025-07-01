@@ -1,94 +1,20 @@
+use crate::{
+	config,
+	service::{Args, Map, Service},
+};
 use async_trait::async_trait;
 use conduwuit::{Result, Server, debug, debug_info, info, trace, utils::stream::IterStream};
 use database::Database;
 use futures::{Stream, StreamExt, TryStreamExt};
+use service::Manager;
+use service::services::ServicesTrait;
 use std::{
 	any::Any,
 	collections::BTreeMap,
 	sync::{Arc, RwLock},
 };
 use tokio::sync::Mutex;
-
-use crate::{
-	MapVal, config,
-	manager::Manager,
-	service::{Args, Map, Service},
-};
-
-/// Abstract interface for Services
-#[async_trait]
-pub trait ServicesTrait: Any + Send + Sync {
-	// type Services: ServicesTrait;
-	type BuildResult: Send;
-
-	// Core methods that need to be implemented
-	fn server(&self) -> Arc<Server>;
-	fn service_map(&self) -> Arc<Map>;
-	// fn config(&self) -> &Arc<config::Service>;
-	// fn db(&self) -> &Arc<Database>;
-	// fn manager(&self) -> Option<&Mutex<Option<Arc<Manager<Self>>>>> where Self: Sized { None }
-
-	// Methods with default implementations
-	async fn clear_cache(&self) {
-		self.services()
-			.for_each(|service| async move {
-				service.clear_cache().await;
-			})
-			.await;
-	}
-
-	async fn memory_usage(&self) -> Result<String> {
-		self.services()
-			.map(Ok)
-			.try_fold(String::new(), |mut out, service| async move {
-				service.memory_usage(&mut out).await?;
-				Ok(out)
-			})
-			.await
-	}
-
-	fn interrupt(&self) {
-		debug!("Interrupting services...");
-		for (name, (service, ..)) in self
-			.service_map()
-			.read()
-			.expect("locked for reading")
-			.iter()
-		{
-			if let Some(service) = service.upgrade() {
-				trace!("Interrupting {name}");
-				service.interrupt();
-			}
-		}
-	}
-
-	// Iterate from snapshot of the services map
-	fn services(&self) -> impl Stream<Item = Arc<dyn Service>> + Send {
-		self.service_map()
-			.read()
-			.expect("locked for reading")
-			.values()
-			.filter_map(|val| val.0.upgrade())
-			.collect::<Vec<_>>()
-			.into_iter()
-			.stream()
-	}
-
-	// Abstract methods that need to be implemented
-	async fn start(server: Arc<Server>) -> Result<Self::BuildResult>
-	where
-		Self: Sized;
-	async fn stop(&self);
-	async fn poll(&self) -> Result<()>;
-
-	// fn try_get<T>(&self, name: &str) -> Result<Arc<T>>
-	// where
-	// 	T: Any + Send + Sync + Sized;
-	//
-	// fn get<T>(&self, name: &str) -> Option<Arc<T>>
-	// where
-	// 	T: Any + Send + Sync + Sized;
-}
+use conduwuit_router::{Guard, Router, RouterServices, State};
 
 pub struct Services {
 	pub config: Arc<config::Service>,
@@ -105,6 +31,7 @@ impl ServicesTrait for Services {
 
 	#[allow(clippy::cognitive_complexity)]
 	async fn start(server: Arc<Server>) -> Result<Arc<Self>> {
+		// FIXME: We're currently creating a new db for each set of services
 		let db = Database::open(&server).await?;
 		let service_map: Arc<Map> = Arc::new(RwLock::new(BTreeMap::new()));
 		macro_rules! build {
@@ -207,6 +134,16 @@ impl ServicesTrait for Services {
 		self.service_map.clone()
 	}
 
+	fn db(&self) -> Arc<Database> {
+		self.db.clone()
+	}
+
+	fn name(&self) -> String {
+		"CoreServices".to_string()
+	}
+
+	fn check_refs(self) {}
+
 	// fn config(&self) -> &Arc<config::Service> {
 	// 	&self.config
 	// }
@@ -220,6 +157,14 @@ impl ServicesTrait for Services {
 	// }
 }
 
+impl RouterServices for Services {
+	type Guard = Guard<Services>;
+
+	fn build(router: Router<State<Self>>, _server: &Server) -> Router<State<Self>> {
+		router
+	}
+}
+
 #[allow(clippy::needless_pass_by_value)]
 fn add_service(map: &Arc<Map>, s: Arc<dyn Service>, a: Arc<dyn Any + Send + Sync>) {
 	let name = s.name();
@@ -229,44 +174,4 @@ fn add_service(map: &Arc<Map>, s: Arc<dyn Service>, a: Arc<dyn Any + Send + Sync
 	map.write()
 		.expect("locked for writing")
 		.insert(name.to_owned(), (Arc::downgrade(&s), Arc::downgrade(&a)));
-}
-
-// TODO: use macro to impl this for arbitrary sized tuples
-#[async_trait]
-impl<T1: ServicesTrait, T2: ServicesTrait> ServicesTrait for (T1, T2) {
-	type BuildResult = (T1::BuildResult, T2::BuildResult);
-
-	fn server(&self) -> Arc<Server> {
-		self.0.server()
-	}
-
-	fn service_map(&self) -> Arc<Map> {
-		let mut map = BTreeMap::new();
-		copy_service_map(&mut map, &self.0.service_map());
-		copy_service_map(&mut map, &self.1.service_map());
-		Arc::new(RwLock::new(map))
-	}
-
-	async fn start(server: Arc<Server>) -> Result<(T1::BuildResult, T2::BuildResult)>
-	where
-		Self: Sized,
-	{
-		Ok((T1::start(server.clone()).await?, T2::start(server.clone()).await?))
-	}
-
-	async fn stop(&self) {
-		self.0.stop().await;
-		self.1.stop().await;
-	}
-
-	async fn poll(&self) -> Result<()> {
-		self.0.poll().await?;
-		self.1.poll().await
-	}
-}
-
-fn copy_service_map(out_map: &mut BTreeMap<String, MapVal>, in_map: &Map) {
-	for (key, val) in in_map.read().expect("locked for reading").iter() {
-		out_map.insert(key.clone(), val.clone());
-	}
 }

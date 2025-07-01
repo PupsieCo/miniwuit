@@ -2,7 +2,7 @@ use std::{fmt::Write, path::PathBuf, sync::Arc};
 
 use conduwuit::{Err, Result, info, utils::time, warn};
 use ruma::events::room::message::RoomMessageEventContent;
-use conduwuit_service::services::ServicesTrait;
+use conduwuit_service_core::services::ServicesTrait;
 
 use crate::admin_command;
 

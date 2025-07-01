@@ -14,7 +14,7 @@ pub struct Service {
 const SIGNAL: &str = "SIGUSR1";
 
 #[async_trait]
-impl crate::Service for Service {
+impl service::Service for Service {
 	fn build(args: crate::service::Args<'_>) -> Result<Arc<Self>> {
 		Ok(Arc::new(Self { server: args.server.clone() }))
 	}
@@ -31,7 +31,7 @@ impl crate::Service for Service {
 		Ok(())
 	}
 
-	fn name(&self) -> &str { crate::service::make_name(std::module_path!()) }
+	fn name(&self) -> &str { service::service::make_name(std::module_path!()) }
 }
 
 impl Deref for Service {

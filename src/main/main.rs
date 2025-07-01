@@ -56,7 +56,7 @@ async fn async_main(server: &Arc<Server>) -> Result<(), Error> {
 		},
 	};
 
-	if let Err(error) = router::run(
+	if let Err(error) = router::run((
 		server
 			.core_services
 			.lock()
@@ -68,7 +68,7 @@ async fn async_main(server: &Arc<Server>) -> Result<(), Error> {
 			.lock()
 			.await
 			.as_ref()
-			.expect("social services initialized"),
+			.expect("social services initialized")),
 	)
 	.await
 	{

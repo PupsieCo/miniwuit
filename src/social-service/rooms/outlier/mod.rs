@@ -4,7 +4,7 @@ use conduwuit::{Result, implement, matrix::pdu::PduEvent};
 use conduwuit_database::{Deserialized, Json, Map};
 use ruma::{CanonicalJsonObject, EventId};
 
-use conduwuit_service::{Args, Service as ServiceTrait};
+use service_core::{Args, Service as ServiceTrait};
 
 pub struct Service {
 	db: Data,
@@ -23,7 +23,7 @@ impl ServiceTrait for Service {
 		}))
 	}
 
-	fn name(&self) -> &str { conduwuit_service::service::make_name(std::module_path!()) }
+	fn name(&self) -> &str { service_core::service::make_name(std::module_path!()) }
 }
 
 /// Returns the pdu from the outlier tree.

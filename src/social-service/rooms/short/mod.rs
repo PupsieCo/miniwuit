@@ -8,7 +8,7 @@ use ruma::{EventId, RoomId, events::StateEventType};
 use serde::Deserialize;
 
 use crate::globals;
-use conduwuit_service::{Dep, Args, Service as ServiceTrait};
+use service_core::{Dep, Args, Service as ServiceTrait};
 
 pub struct Service {
 	db: Data,
@@ -47,7 +47,7 @@ impl ServiceTrait for Service {
 		}))
 	}
 
-	fn name(&self) -> &str { conduwuit_service::service::make_name(std::module_path!()) }
+	fn name(&self) -> &str { service_core::service::make_name(std::module_path!()) }
 }
 
 #[implement(Service)]

@@ -36,7 +36,7 @@ use tokio::sync::{Mutex, MutexGuard};
 
 pub use self::pagination_token::PaginationToken;
 use crate::{rooms, sending};
-use conduwuit_service::{Dep, Args, Service as ServiceTrait};
+use service_core::{Dep, Args, Service as ServiceTrait};
 
 pub struct Service {
 	services: Services,
@@ -102,7 +102,7 @@ impl ServiceTrait for Service {
 
 	async fn clear_cache(&self) { self.roomid_spacehierarchy_cache.lock().await.clear(); }
 
-	fn name(&self) -> &str { conduwuit_service::service::make_name(std::module_path!()) }
+	fn name(&self) -> &str { service_core::service::make_name(std::module_path!()) }
 }
 
 /// Gets the summary of a space using solely local information

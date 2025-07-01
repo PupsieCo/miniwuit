@@ -29,7 +29,8 @@ use ruma::{
 };
 
 use crate::{account_data, appservice::RegistrationInfo, globals, rooms, users};
-use conduwuit_service::{Dep, Args, Service as ServiceTrait, config};
+use conduwuit_service::config;
+use service_core::{Args, Dep, Service as ServiceTrait};
 
 pub struct Service {
 	appservice_in_room_cache: AppServiceInRoomCache,
@@ -99,7 +100,9 @@ impl ServiceTrait for Service {
 		}))
 	}
 
-	fn name(&self) -> &str { conduwuit_service::service::make_name(std::module_path!()) }
+	fn name(&self) -> &str {
+		service_core::service::make_name(std::module_path!())
+	}
 }
 
 impl Service {

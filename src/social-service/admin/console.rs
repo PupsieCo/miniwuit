@@ -13,7 +13,7 @@ use termimad::MadSkin;
 use tokio::task::JoinHandle;
 
 use crate::{admin};
-use conduwuit_service::{Dep, Args, Service as ServiceTrait};
+use service_core::{Dep, Args, Service as ServiceTrait};
 
 pub struct Console {
 	server: Arc<Server>,

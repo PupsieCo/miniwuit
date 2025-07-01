@@ -1246,6 +1246,7 @@ dependencies = [
  "conduwuit_core",
  "conduwuit_database",
  "conduwuit_router",
+ "conduwuit_service",
  "conduwuit_social_admin",
  "conduwuit_social_api",
  "conduwuit_social_service",
@@ -1353,8 +1354,7 @@ dependencies = [
  "axum-server-dual-protocol",
  "bytes",
  "conduwuit_core",
- "conduwuit_service",
- "conduwuit_social_service",
+ "conduwuit_service_core",
  "const-str",
  "futures",
  "http 1.3.1",
@@ -1377,6 +1377,45 @@ dependencies = [
 
 [[package]]
 name = "conduwuit_service"
+version = "0.5.0"
+dependencies = [
+ "async-trait",
+ "base64 0.22.1",
+ "blurhash",
+ "bytes",
+ "conduwuit_core",
+ "conduwuit_database",
+ "conduwuit_router",
+ "conduwuit_service_core",
+ "const-str",
+ "either",
+ "futures",
+ "hickory-resolver 0.25.1",
+ "http 1.3.1",
+ "image",
+ "ipaddress",
+ "itertools 0.14.0",
+ "log",
+ "loole",
+ "lru-cache",
+ "rand 0.8.5",
+ "regex",
+ "reqwest",
+ "ruma",
+ "rustyline-async",
+ "serde",
+ "serde_json",
+ "serde_yaml",
+ "sha2",
+ "termimad",
+ "tokio",
+ "tracing",
+ "url",
+ "webpage",
+]
+
+[[package]]
+name = "conduwuit_service_core"
 version = "0.5.0"
 dependencies = [
  "async-trait",
@@ -1420,6 +1459,7 @@ dependencies = [
  "conduwuit_core",
  "conduwuit_database",
  "conduwuit_service",
+ "conduwuit_service_core",
  "conduwuit_social_api",
  "conduwuit_social_macros",
  "conduwuit_social_service",
@@ -1487,7 +1527,9 @@ dependencies = [
  "bytes",
  "conduwuit_core",
  "conduwuit_database",
+ "conduwuit_router",
  "conduwuit_service",
+ "conduwuit_service_core",
  "const-str",
  "either",
  "futures",

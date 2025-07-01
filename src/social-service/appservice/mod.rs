@@ -12,7 +12,7 @@ use tokio::sync::RwLock;
 
 pub use self::{namespace_regex::NamespaceRegex, registration_info::RegistrationInfo};
 use crate::sending;
-use conduwuit_service::{Dep, Args, Service as ServiceTrait};
+use service_core::{Dep, Args, Service as ServiceTrait};
 
 pub struct Service {
 	registration_info: RwLock<BTreeMap<String, RegistrationInfo>>,
@@ -57,7 +57,7 @@ impl ServiceTrait for Service {
 		Ok(())
 	}
 
-	fn name(&self) -> &str { conduwuit_service::service::make_name(std::module_path!()) }
+	fn name(&self) -> &str { service_core::service::make_name(std::module_path!()) }
 }
 
 impl Service {

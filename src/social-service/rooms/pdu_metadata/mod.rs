@@ -8,7 +8,7 @@ use ruma::{EventId, RoomId, UserId, api::Direction};
 use self::data::{Data, PdusIterItem};
 use crate::rooms;
 
-use conduwuit_service::{Dep, Args, Service as ServiceTrait};
+use service_core::{Dep, Args, Service as ServiceTrait};
 
 pub struct Service {
 	services: Services,
@@ -31,7 +31,7 @@ impl ServiceTrait for Service {
 		}))
 	}
 
-	fn name(&self) -> &str { conduwuit_service::service::make_name(std::module_path!()) }
+	fn name(&self) -> &str { service_core::service::make_name(std::module_path!()) }
 }
 
 impl Service {

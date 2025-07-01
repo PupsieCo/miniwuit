@@ -22,7 +22,7 @@ use crate::{
 	},
 };
 
-use conduwuit_service::{Dep, Args};
+use service_core::{Dep, Args};
 
 pub(super) struct Data {
 	tofrom_relation: Arc<Map>,

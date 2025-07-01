@@ -1,18 +1,17 @@
 use std::{any::Any, sync::Arc, time::Duration};
 
+use crate::{RouterServices, request, router};
 use axum::{
 	Router,
 	extract::{DefaultBodyLimit, MatchedPath},
 };
 use axum_client_ip::SecureClientIpSource;
 use conduwuit::{Result, Server, debug, error};
-use crate::state::Guard;
-use conduwuit_service::Services as CoreServices;
-use conduwuit_social_service::Services as SocialServices;
 use http::{
 	HeaderValue, Method, StatusCode,
 	header::{self, HeaderName},
 };
+use service::ServicesTrait;
 use tower::ServiceBuilder;
 use tower_http::{
 	catch_panic::CatchPanicLayer,
@@ -24,8 +23,6 @@ use tower_http::{
 };
 use tracing::Level;
 
-use crate::{request, router};
-
 const CONDUWUIT_CSP: &[&str; 5] = &[
 	"default-src 'none'",
 	"frame-ancestors 'none'",
@@ -36,8 +33,8 @@ const CONDUWUIT_CSP: &[&str; 5] = &[
 
 const CONDUWUIT_PERMISSIONS_POLICY: &[&str; 2] = &["interest-cohort=()", "browsing-topics=()"];
 
-pub(crate) fn build((core_services, social_services): (Arc<CoreServices>, Arc<SocialServices>)) -> Result<(Router, Guard)> {
-	let server = &core_services.server;
+pub(crate) fn build<R: RouterServices + Clone>(services: R) -> Result<(Router, R::Guard)> {
+	let server = &services.server();
 	let layers = ServiceBuilder::new();
 
 	#[cfg(feature = "sentry_telemetry")]
@@ -50,8 +47,7 @@ pub(crate) fn build((core_services, social_services): (Arc<CoreServices>, Arc<So
 	))]
 	let layers = layers.layer(compression_layer(server));
 
-	let core_services_ = core_services.clone();
-	let social_services_ = social_services.clone();
+	let services_ = services.clone();
 	let layers = layers
 		.layer(SetSensitiveHeadersLayer::new([header::AUTHORIZATION]))
 		.layer(
@@ -61,8 +57,7 @@ pub(crate) fn build((core_services, social_services): (Arc<CoreServices>, Arc<So
 				.on_request(DefaultOnRequest::new().level(Level::TRACE))
 				.on_response(DefaultOnResponse::new().level(Level::DEBUG)),
 		)
-		.layer(axum::middleware::from_fn_with_state(Arc::clone(core_services), request::handle))
-		.layer(axum::middleware::from_fn_with_state(Arc::clone(social_services), request::handle))
+		.layer(axum::middleware::from_fn_with_state(services.clone(), request::handle::<R>))
 		.layer(SecureClientIpSource::ConnectInfo.into_extension())
 		.layer(ResponseBodyTimeoutLayer::new(Duration::from_secs(
 			server.config.client_response_timeout,
@@ -97,9 +92,9 @@ pub(crate) fn build((core_services, social_services): (Arc<CoreServices>, Arc<So
 		))
 		.layer(cors_layer(server))
 		.layer(body_limit_layer(server))
-		.layer(CatchPanicLayer::custom(move |panic| catch_panic(panic, social_services_.clone())));
+		.layer(CatchPanicLayer::custom(move |panic| catch_panic(panic, services_.clone())));
 
-	let (router, guard) = router::build((core_services_, social_services_));
+	let (router, guard) = router::build(&services);
 	Ok((router.layer(layers), guard))
 }
 
@@ -173,12 +168,12 @@ fn body_limit_layer(server: &Server) -> DefaultBodyLimit {
 
 #[tracing::instrument(name = "panic", level = "error", skip_all)]
 #[allow(clippy::needless_pass_by_value)]
-fn catch_panic(
+fn catch_panic<R: ServicesTrait>(
 	err: Box<dyn Any + Send + 'static>,
-	social_services: Arc<SocialServices>,
+	services: R,
 ) -> http::Response<http_body_util::Full<bytes::Bytes>> {
-	social_services
-		.server
+	services
+		.server()
 		.metrics
 		.requests_panic
 		.fetch_add(1, std::sync::atomic::Ordering::Release);

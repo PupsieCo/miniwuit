@@ -3,7 +3,7 @@ use std::sync::Arc;
 use conduwuit::{Result, implement};
 use database::{Handle, Map};
 use ruma::{DeviceId, TransactionId, UserId};
-use conduwuit_service::{Args, Service as ServiceTrait};
+use service_core::{Args, Service as ServiceTrait};
 
 pub struct Service {
 	db: Data,
@@ -22,7 +22,7 @@ impl ServiceTrait for Service {
 		}))
 	}
 
-	fn name(&self) -> &str { conduwuit_service::service::make_name(std::module_path!()) }
+	fn name(&self) -> &str { service_core::service::make_name(std::module_path!()) }
 }
 
 #[implement(Service)]

@@ -2,7 +2,7 @@ use std::sync::{Arc, RwLock};
 
 use conduwuit::{Result, utils};
 use database::{Database, Deserialized, Map};
-use conduwuit_service::Args;
+use service_core::Args;
 
 pub struct Data {
 	global: Arc<Map>,

@@ -31,6 +31,7 @@ pub mod users;
 extern crate conduwuit_core as conduwuit;
 extern crate conduwuit_database as database;
 extern crate conduwuit_service as conduwuit_service;
+extern crate conduwuit_service_core as service_core;
 
 // pub(crate) use service::{Args, Dep, Service};
 

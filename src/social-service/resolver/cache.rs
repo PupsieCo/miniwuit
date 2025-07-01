@@ -6,7 +6,7 @@ use conduwuit::{
 	at, err, implement,
 	utils::{math::Expected, rand, stream::TryIgnore},
 };
-use conduwuit_service::Args;
+use service_core::Args;
 use database::{Cbor, Deserialized, Map};
 use futures::{Stream, StreamExt, future::join};
 use ruma::ServerName;

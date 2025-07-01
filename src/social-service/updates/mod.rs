@@ -11,7 +11,7 @@ use tokio::{
 };
 
 use crate::{admin, client, globals};
-use conduwuit_service::{Dep, Args, Service as ServiceTrait};
+use service_core::{Dep, Args, Service as ServiceTrait};
 
 pub struct Service {
 	interval: Duration,
@@ -85,7 +85,7 @@ impl ServiceTrait for Service {
 
 	fn interrupt(&self) { self.interrupt.notify_waiters(); }
 
-	fn name(&self) -> &str { conduwuit_service::service::make_name(std::module_path!()) }
+	fn name(&self) -> &str { service_core::service::make_name(std::module_path!()) }
 }
 
 impl Service {

@@ -9,19 +9,20 @@ use axum::{
 	response::{IntoResponse, Response},
 };
 use conduwuit::{Result, debug, debug_error, debug_warn, err, error, trace};
-use conduwuit_service::Services;
 use futures::FutureExt;
 use http::{Method, StatusCode, Uri};
 use tokio::time::sleep;
 use tracing::Span;
+use service::ServicesTrait;
 
 #[tracing::instrument(name = "request", level = "debug", skip_all)]
-pub(crate) async fn handle(
-	State(services): State<Arc<Services>>,
+pub(crate) async fn handle<R: ServicesTrait + Clone>(
+	State(services): State<R>,
 	req: http::Request<axum::body::Body>,
 	next: axum::middleware::Next,
 ) -> Result<Response, StatusCode> {
-	if !services.server.running() {
+	let server = services.server();
+	if !server.running() {
 		debug_warn!(
 			method = %req.method(),
 			uri = %req.uri(),
@@ -34,13 +35,14 @@ pub(crate) async fn handle(
 	let uri = req.uri().clone();
 	let method = req.method().clone();
 	let services_ = services.clone();
+	let server_ = server.clone();
 	let parent = Span::current();
-	let task = services.server.runtime().spawn(async move {
+	let task = server.runtime().spawn(async move {
 		tokio::select! {
 			response = execute(&services_, req, next, &parent) => response,
-			response = services_.server.until_shutdown()
+			response = server_.until_shutdown()
 				.then(|()| {
-					let timeout = services_.server.config.client_shutdown_timeout;
+					let timeout = server_.config.client_shutdown_timeout;
 					let timeout = Duration::from_secs(timeout);
 					sleep(timeout)
 				})
@@ -61,33 +63,33 @@ pub(crate) async fn handle(
 	skip_all,
 	fields(
 		active = %services
-			.server
+			.server()
 			.metrics
 			.requests_handle_active
 			.fetch_add(1, Ordering::Relaxed),
 		handled = %services
-			.server
+			.server()
 			.metrics
 			.requests_handle_finished
 			.load(Ordering::Relaxed),
 	)
 )]
-async fn execute(
+async fn execute<R: ServicesTrait>(
 	// we made a safety contract that Services will not go out of scope
 	// during the request; this ensures a reference is accounted for at
 	// the base frame of the task regardless of its detachment.
-	services: &Arc<Services>,
+	services: &R,
 	req: http::Request<axum::body::Body>,
 	next: axum::middleware::Next,
 	parent: &Span,
 ) -> Response {
 	#[cfg(debug_assertions)]
 	conduwuit::defer! {{
-		_ = services.server
+		_ = services.server()
 			.metrics
 			.requests_handle_finished
 			.fetch_add(1, Ordering::Relaxed);
-		_ = services.server
+		_ = services.server()
 			.metrics
 			.requests_handle_active
 			.fetch_sub(1, Ordering::Relaxed);

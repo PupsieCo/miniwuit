@@ -23,7 +23,7 @@ use tokio::{
 use self::data::{Data, Metadata};
 pub use self::thumbnail::Dim;
 use crate::{client, globals, sending};
-use conduwuit_service::{Dep, Args, Service as ServiceTrait};
+use service_core::{Dep, Args, Service as ServiceTrait};
 
 #[derive(Debug)]
 pub struct FileMeta {
@@ -75,7 +75,7 @@ impl ServiceTrait for Service {
 		Ok(())
 	}
 
-	fn name(&self) -> &str { conduwuit_service::service::make_name(std::module_path!()) }
+	fn name(&self) -> &str { service_core::service::make_name(std::module_path!()) }
 }
 
 impl Service {

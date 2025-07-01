@@ -8,14 +8,15 @@ use std::{
 	sync::{Arc, RwLock},
 };
 use tokio::sync::Mutex;
-
+use conduwuit_router::{Guard, Router, RouterServices, State};
 use crate::{
 	account_data, admin, appservice, client, emergency, federation, globals, key_backups, media,
 	presence, pusher, resolver, rooms, sending, server_keys, sync, transaction_ids, uiaa,
 	updates, users,
 };
 
-use conduwuit_service::{Args, Manager, Map, Service, ServicesTrait, config};
+use service_core::{Args, Manager, Map, Service, ServicesTrait};
+use conduwuit_service::config;
 
 pub struct Services {
 	pub account_data: Arc<account_data::Service>,
@@ -53,6 +54,7 @@ impl ServicesTrait for Services {
 
 	#[allow(clippy::cognitive_complexity)]
 	async fn start(server: Arc<Server>) -> Result<Arc<Self>> {
+		// FIXME: We're currently creating a new db for each set of services
 		let db = Database::open(&server).await?;
 		let service: Arc<Map> = Arc::new(RwLock::new(BTreeMap::new()));
 		macro_rules! build {
@@ -208,6 +210,16 @@ impl ServicesTrait for Services {
 	fn service_map(&self) -> Arc<Map> {
 		self.service.clone()
 	}
+
+	fn db(&self) -> Arc<Database> {
+		self.db.clone()
+	}
+
+	fn name(&self) -> String {
+		"SocialServices".to_string()
+	}
+
+	fn check_refs(self) {}
 
 	//
 	// fn config(&self) -> &Arc<config::Service> {

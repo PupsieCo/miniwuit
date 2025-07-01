@@ -13,7 +13,7 @@ use ruma::{
 };
 
 use crate::globals;
-use conduwuit_service::{Dep, Args};
+use service_core::{Dep, Args};
 
 pub(super) struct Data {
 	roomuserid_privateread: Arc<Map>,

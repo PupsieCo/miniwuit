@@ -4,7 +4,7 @@ use std::{
 };
 
 use conduwuit::{Err, Result, err, utils, utils::math::usize_from_f64};
-use conduwuit_service::Args;
+use service_core::Args;
 use database::Map;
 use lru_cache::LruCache;
 

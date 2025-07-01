@@ -10,7 +10,7 @@ use database::{Database, Deserialized, Handle, Interfix, Map, Qry};
 use futures::{Stream, StreamExt, pin_mut};
 use ruma::{DeviceId, OwnedUserId, RoomId, UserId, api::client::filter::LazyLoadOptions};
 
-use conduwuit_service::{Args, Service as ServiceTrait};
+use service_core::{Args, Service as ServiceTrait};
 
 pub struct Service {
 	db: Data,
@@ -54,7 +54,7 @@ impl ServiceTrait for Service {
 		}))
 	}
 
-	fn name(&self) -> &str { conduwuit_service::service::make_name(std::module_path!()) }
+	fn name(&self) -> &str { service_core::service::make_name(std::module_path!()) }
 }
 
 #[implement(Service)]

@@ -1,8 +1,6 @@
 #![type_length_limit = "2048"]
 #![allow(refining_impl_trait)]
 
-pub mod manager;
-pub mod service;
 pub mod services;
 pub mod config;
 
@@ -10,17 +8,9 @@ pub mod config;
 
 extern crate conduwuit_core as conduwuit;
 extern crate conduwuit_database as database;
+extern crate conduwuit_service_core as service;
 
-pub use crate::service::Service;
 pub use crate::services::Services;
-pub use crate::services::ServicesTrait;
-pub use crate::manager::Manager;
-pub use crate::service::Args;
-pub use crate::service::Dep;
-pub use crate::service::Map;
-pub use crate::service::MapType;
-pub use crate::service::MapKey;
-pub use crate::service::MapVal;
 
 conduwuit::mod_ctor! {}
 conduwuit::mod_dtor! {}

@@ -70,6 +70,7 @@ pub(crate) async fn run(server: &Arc<Server>, starts: bool) -> Result<(bool, boo
 			.await
 			.as_ref()
 			.expect("social services initialized"),
+	)
 	.await
 	{
 		error!("Running server: {error}");

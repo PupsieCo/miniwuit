@@ -12,7 +12,7 @@ use ruma::{CanonicalJsonObject, EventId, OwnedUserId, RoomId, UserId, api::Direc
 
 use super::{PduId, RawPduId};
 use crate::{rooms, rooms::short::ShortRoomId};
-use conduwuit_service::{Dep, Args};
+use service_core::{Dep, Args};
 
 pub(super) struct Data {
 	eventid_outlierpdu: Arc<Map>,

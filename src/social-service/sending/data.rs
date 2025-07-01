@@ -10,7 +10,7 @@ use ruma::{OwnedServerName, ServerName, UserId};
 
 use super::{Destination, SendingEvent};
 use crate::globals;
-use conduwuit_service::{Dep, Args};
+use service_core::{Dep, Args};
 
 pub(super) type OutgoingItem = (Key, SendingEvent, Destination);
 pub(super) type SendingItem = (Key, SendingEvent);

@@ -4,7 +4,7 @@ use conduwuit::{Result, implement, utils::stream::TryIgnore};
 use database::Map;
 use futures::Stream;
 use ruma::{RoomId, api::client::room::Visibility};
-use conduwuit_service::{Args, Service as ServiceTrait};
+use service_core::{Args, Service as ServiceTrait};
 
 pub struct Service {
 	db: Data,
@@ -23,7 +23,7 @@ impl ServiceTrait for Service {
 		}))
 	}
 
-	fn name(&self) -> &str { conduwuit_service::service::make_name(std::module_path!()) }
+	fn name(&self) -> &str { service_core::service::make_name(std::module_path!()) }
 }
 
 #[implement(Service)]

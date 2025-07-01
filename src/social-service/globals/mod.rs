@@ -13,7 +13,7 @@ use data::Data;
 use regex::RegexSet;
 use ruma::{OwnedEventId, OwnedRoomAliasId, OwnedServerName, OwnedUserId, ServerName, UserId};
 
-use conduwuit_service::{Args, Service as ServiceTrait};
+use service_core::{Args, Service as ServiceTrait};
 
 pub struct Service {
 	pub db: Data,
@@ -98,7 +98,7 @@ impl ServiceTrait for Service {
 			.clear();
 	}
 
-	fn name(&self) -> &str { conduwuit_service::service::make_name(std::module_path!()) }
+	fn name(&self) -> &str { service_core::service::make_name(std::module_path!()) }
 }
 
 impl Service {

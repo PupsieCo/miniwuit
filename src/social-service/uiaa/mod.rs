@@ -17,7 +17,8 @@ use ruma::{
 };
 
 use crate::{globals, users};
-use conduwuit_service::{Dep, Args, Service as ServiceTrait, config};
+use conduwuit_service::config;
+use service_core::{Args, Dep, Service as ServiceTrait};
 
 pub struct Service {
 	userdevicesessionid_uiaarequest: RwLock<RequestMap>,
@@ -55,7 +56,9 @@ impl ServiceTrait for Service {
 		}))
 	}
 
-	fn name(&self) -> &str { conduwuit_service::service::make_name(std::module_path!()) }
+	fn name(&self) -> &str {
+		service_core::service::make_name(std::module_path!())
+	}
 }
 
 #[implement(Service)]

@@ -1,6 +1,5 @@
 // extern crate conduwuit_social_admin as admin;
 extern crate conduwuit_core as conduwuit;
-extern crate conduwuit_service as service;
 
 use std::{
 	sync::{Arc, Weak, atomic::Ordering},
@@ -11,19 +10,17 @@ use axum_server::Handle as ServerHandle;
 use conduwuit::{Error, Result, Server, debug, debug_error, debug_info, error, info};
 use futures::FutureExt;
 // use service::Services;
-use conduwuit_service::services::{Services as CoreServices, ServicesTrait};
-use conduwuit_social_service::services::{Services as SocialServices};
 use tokio::{
 	sync::broadcast::{self, Sender},
 	task::JoinHandle,
 };
-
-use crate::serve;
+use service::ServicesTrait;
+use crate::{serve, RouterServices};
 
 /// Main loop base
 #[tracing::instrument(skip_all)]
-pub(crate) async fn run(core_services: Arc<CoreServices>, social_services: Arc<SocialServices>) -> Result<()> {
-	let server = &core_services.server;
+pub(crate) async fn run<R: RouterServices + Clone>(services: R) -> Result<()> {
+	let server = &services.server();
 	debug!("Start");
 
 	// Install the admin room callback here for now
@@ -39,14 +36,13 @@ pub(crate) async fn run(core_services: Arc<CoreServices>, social_services: Arc<S
 	let mut listener =
 		server
 			.runtime()
-			.spawn(serve::serve(core_services.clone(), social_services.clone(), handle.clone(), tx.subscribe()));
+			.spawn(serve::serve(services.clone(), handle.clone(), tx.subscribe()));
 
 	// Focal point
 	debug!("Running");
 	let res = tokio::select! {
 		res = &mut listener => res.map_err(Error::from).unwrap_or_else(Err),
-		res = core_services.poll() => handle_services_poll(server, res, listener).await,
-		res = social_services.poll() => handle_services_poll(server, res, listener).await,
+		res = services.poll() => handle_services_poll(server, res, listener).await,
 	};
 
 	// Join the signal handler before we leave.
@@ -62,23 +58,22 @@ pub(crate) async fn run(core_services: Arc<CoreServices>, social_services: Arc<S
 
 /// Async initializations
 #[tracing::instrument(skip_all)]
-pub(crate) async fn start(server: Arc<Server>) -> Result<(Arc<CoreServices>, Arc<SocialServices>)> {
+pub(crate) async fn start<R: ServicesTrait>(server: Arc<Server>) -> Result<R::BuildResult> {
 	debug!("Starting...");
 
-	let core_services = CoreServices::start(server).await?.start().await?;
-	let social_services = SocialServices::start(server).await?.start().await?;
+	let services = R::start(server).await?;
 
 	#[cfg(all(feature = "systemd", target_os = "linux"))]
 	sd_notify::notify(true, &[sd_notify::NotifyState::Ready])
 		.expect("failed to notify systemd of ready state");
 
 	debug!("Started");
-	Ok((core_services, social_services))
+	Ok(services)
 }
 
 /// Async destructions
 #[tracing::instrument(skip_all)]
-pub(crate) async fn stop(core_services: Arc<CoreServices>, social_services: Arc<SocialServices>) -> Result<()> {
+pub(crate) async fn stop<R: ServicesTrait>(services: R) -> Result<()> {
 	debug!("Shutting down...");
 
 	#[cfg(all(feature = "systemd", target_os = "linux"))]
@@ -87,27 +82,15 @@ pub(crate) async fn stop(core_services: Arc<CoreServices>, social_services: Arc<
 
 	// Wait for all completions before dropping or we'll lose them to the module
 	// unload and explode.
-	core_services.stop().await;
-	social_services.stop().await;
+	services.stop().await;
 
 	// Check that Services and Database will drop as expected, The complex of Arc's
 	// used for various components can easily lead to references being held
 	// somewhere improperly; this can hang shutdowns.
 	debug!("Cleaning up...");
-	let db = Arc::downgrade(&social_services.db);
-	if let Err(core_services) = Arc::try_unwrap(core_services) {
-		debug_error!(
-			"{} dangling references to CoreServices after shutdown",
-			Arc::strong_count(&core_services)
-		);
-	}
-
-	if let Err(social_services) = Arc::try_unwrap(social_services) {
-		debug_error!(
-			"{} dangling references to SocialServices after shutdown",
-			Arc::strong_count(&social_services)
-		);
-	}
+	// FIXME: should we be doing this for sub-services?
+	let db = Arc::downgrade(&services.db());
+	services.check_refs();
 
 	if Weak::strong_count(&db) > 0 {
 		debug_error!(
