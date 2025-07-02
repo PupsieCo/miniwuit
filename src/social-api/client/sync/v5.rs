@@ -53,7 +53,7 @@ type SyncInfo<'a> = (&'a UserId, &'a DeviceId, u64, &'a sync_events::v5::Request
 /// [MSC3575]: https://github.com/matrix-org/matrix-spec-proposals/pull/3575
 /// [MSC4186]: https://github.com/matrix-org/matrix-spec-proposals/pull/4186
 pub(crate) async fn sync_events_v5_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	body: Ruma<sync_events::v5::Request>,
 ) -> Result<sync_events::v5::Response> {
 	debug_assert!(DEFAULT_BUMP_TYPES.is_sorted(), "DEFAULT_BUMP_TYPES is not sorted");
@@ -212,7 +212,7 @@ type KnownRooms = BTreeMap<String, BTreeMap<OwnedRoomId, u64>>;
 pub(crate) type TodoRooms = BTreeMap<OwnedRoomId, (BTreeSet<TypeStateKey>, usize, u64)>;
 
 async fn fetch_subscriptions(
-	services: crate::State,
+	services: conduwuit_router::State<service::Services>,
 	(sender_user, sender_device, globalsince, body): SyncInfo<'_>,
 	known_rooms: &KnownRooms,
 	todo_rooms: &mut TodoRooms,
@@ -268,7 +268,7 @@ async fn fetch_subscriptions(
 
 #[allow(clippy::too_many_arguments)]
 async fn handle_lists<'a>(
-	services: crate::State,
+	services: conduwuit_router::State<service::Services>,
 	(sender_user, sender_device, globalsince, body): SyncInfo<'_>,
 	all_invited_rooms: &Vec<&'a RoomId>,
 	all_joined_rooms: &Vec<&'a RoomId>,
@@ -355,7 +355,7 @@ async fn handle_lists<'a>(
 }
 
 async fn process_rooms(
-	services: crate::State,
+	services: conduwuit_router::State<service::Services>,
 	sender_user: &UserId,
 	next_batch: u64,
 	all_invited_rooms: &[&RoomId],
@@ -644,7 +644,7 @@ async fn process_rooms(
 	Ok(rooms)
 }
 async fn collect_account_data(
-	services: crate::State,
+	services: conduwuit_router::State<service::Services>,
 	(sender_user, _, globalsince, body): (&UserId, &DeviceId, u64, &sync_events::v5::Request),
 ) -> sync_events::v5::response::AccountData {
 	let mut account_data = sync_events::v5::response::AccountData {
@@ -681,7 +681,7 @@ async fn collect_account_data(
 }
 
 async fn collect_e2ee<'a>(
-	services: crate::State,
+	services: conduwuit_router::State<service::Services>,
 	(sender_user, sender_device, globalsince, body): (
 		&UserId,
 		&DeviceId,
@@ -869,7 +869,7 @@ async fn collect_e2ee<'a>(
 }
 
 async fn collect_to_device(
-	services: crate::State,
+	services: conduwuit_router::State<service::Services>,
 	(sender_user, sender_device, globalsince, body): SyncInfo<'_>,
 	next_batch: u64,
 ) -> Option<sync_events::v5::response::ToDevice> {
@@ -892,7 +892,7 @@ async fn collect_to_device(
 	})
 }
 
-async fn collect_receipts(_services: crate::State) -> sync_events::v5::response::Receipts {
+async fn collect_receipts(_services: conduwuit_router::State<service::Services>) -> sync_events::v5::response::Receipts {
 	sync_events::v5::response::Receipts { rooms: BTreeMap::new() }
 	// TODO: get explicitly requested read receipts
 }

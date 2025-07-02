@@ -18,7 +18,7 @@ use crate::Ruma;
 /// Get information on the supported feature set and other relevent capabilities
 /// of this server.
 pub(crate) async fn get_capabilities_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	_body: Ruma<get_capabilities::v3::Request>,
 ) -> Result<get_capabilities::v3::Response> {
 	let available: BTreeMap<RoomVersionId, RoomVersionStability> =

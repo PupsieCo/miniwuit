@@ -18,7 +18,7 @@ use crate::{
 ///
 /// Gets information on all devices of the user.
 pub(crate) async fn get_devices_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	body: Ruma<get_devices::v1::Request>,
 ) -> Result<get_devices::v1::Response> {
 	if !services.globals.user_is_local(&body.user_id) {
@@ -76,7 +76,7 @@ pub(crate) async fn get_devices_route(
 ///
 /// Gets devices and identity keys for the given users.
 pub(crate) async fn get_keys_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	body: Ruma<get_keys::v1::Request>,
 ) -> Result<get_keys::v1::Response> {
 	if body
@@ -110,7 +110,7 @@ pub(crate) async fn get_keys_route(
 ///
 /// Claims one-time keys.
 pub(crate) async fn claim_keys_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	body: Ruma<claim_keys::v1::Request>,
 ) -> Result<claim_keys::v1::Response> {
 	if body

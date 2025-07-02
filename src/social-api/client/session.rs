@@ -36,7 +36,7 @@ use crate::Ruma;
 /// the `type` field when logging in.
 #[tracing::instrument(skip_all, fields(%client), name = "login")]
 pub(crate) async fn get_login_types_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	InsecureClientIp(client): InsecureClientIp,
 	_body: Ruma<get_login_types::v3::Request>,
 ) -> Result<get_login_types::v3::Response> {
@@ -65,7 +65,7 @@ pub(crate) async fn get_login_types_route(
 /// supported login types.
 #[tracing::instrument(skip_all, fields(%client), name = "login")]
 pub(crate) async fn login_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	InsecureClientIp(client): InsecureClientIp,
 	body: Ruma<login::v3::Request>,
 ) -> Result<login::v3::Response> {
@@ -261,7 +261,7 @@ pub(crate) async fn login_route(
 /// <https://spec.matrix.org/v1.13/client-server-api/#post_matrixclientv1loginget_token>
 #[tracing::instrument(skip_all, fields(%client), name = "login_token")]
 pub(crate) async fn login_token_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	InsecureClientIp(client): InsecureClientIp,
 	body: Ruma<get_login_token::v1::Request>,
 ) -> Result<get_login_token::v1::Response> {
@@ -331,7 +331,7 @@ pub(crate) async fn login_token_route(
 /// - Triggers device list updates
 #[tracing::instrument(skip_all, fields(%client), name = "logout")]
 pub(crate) async fn logout_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	InsecureClientIp(client): InsecureClientIp,
 	body: Ruma<logout::v3::Request>,
 ) -> Result<logout::v3::Response> {
@@ -361,7 +361,7 @@ pub(crate) async fn logout_route(
 /// user.
 #[tracing::instrument(skip_all, fields(%client), name = "logout")]
 pub(crate) async fn logout_all_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	InsecureClientIp(client): InsecureClientIp,
 	body: Ruma<logout_all::v3::Request>,
 ) -> Result<logout_all::v3::Response> {

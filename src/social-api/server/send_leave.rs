@@ -20,7 +20,7 @@ use crate::Ruma;
 ///
 /// Submits a signed leave event.
 pub(crate) async fn create_leave_event_v1_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	body: Ruma<create_leave_event::v1::Request>,
 ) -> Result<create_leave_event::v1::Response> {
 	create_leave_event(&services, body.origin(), &body.room_id, &body.pdu).await?;
@@ -32,7 +32,7 @@ pub(crate) async fn create_leave_event_v1_route(
 ///
 /// Submits a signed leave event.
 pub(crate) async fn create_leave_event_v2_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	body: Ruma<create_leave_event::v2::Request>,
 ) -> Result<create_leave_event::v2::Response> {
 	create_leave_event(&services, body.origin(), &body.room_id, &body.pdu).await?;

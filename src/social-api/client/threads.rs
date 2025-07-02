@@ -10,7 +10,7 @@ use crate::Ruma;
 
 /// # `GET /_matrix/client/r0/rooms/{roomId}/threads`
 pub(crate) async fn get_threads_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	ref body: Ruma<get_threads::v1::Request>,
 ) -> Result<get_threads::v1::Response> {
 	// Use limit or else 10, with maximum 100

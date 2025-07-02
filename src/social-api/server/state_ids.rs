@@ -13,7 +13,7 @@ use crate::Ruma;
 /// Retrieves a snapshot of a room's state at a given event, in the form of
 /// event IDs.
 pub(crate) async fn get_room_state_ids_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	body: Ruma<get_room_state_ids::v1::Request>,
 ) -> Result<get_room_state_ids::v1::Response> {
 	AccessCheck {

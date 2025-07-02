@@ -12,7 +12,7 @@ use crate::Ruma;
 /// - Only users joined to the room are allowed to call this, or if
 ///   `history_visibility` is world readable in the room
 pub(crate) async fn get_room_aliases_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	body: Ruma<aliases::v3::Request>,
 ) -> Result<aliases::v3::Response> {
 	let sender_user = body.sender_user.as_ref().expect("user is authenticated");

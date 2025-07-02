@@ -32,7 +32,7 @@ use crate::Ruma;
 ///
 /// - Also makes sure other users receive the update using presence EDUs
 pub(crate) async fn set_displayname_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	body: Ruma<set_display_name::v3::Request>,
 ) -> Result<set_display_name::v3::Response> {
 	let sender_user = body.sender_user.as_ref().expect("user is authenticated");
@@ -70,7 +70,7 @@ pub(crate) async fn set_displayname_route(
 /// - If user is on another server and we do not have a local copy already fetch
 ///   displayname over federation
 pub(crate) async fn get_displayname_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	body: Ruma<get_display_name::v3::Request>,
 ) -> Result<get_display_name::v3::Response> {
 	if !services.globals.user_is_local(&body.user_id) {
@@ -121,7 +121,7 @@ pub(crate) async fn get_displayname_route(
 ///
 /// - Also makes sure other users receive the update using presence EDUs
 pub(crate) async fn set_avatar_url_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	body: Ruma<set_avatar_url::v3::Request>,
 ) -> Result<set_avatar_url::v3::Response> {
 	let sender_user = body.sender_user.as_ref().expect("user is authenticated");
@@ -166,7 +166,7 @@ pub(crate) async fn set_avatar_url_route(
 /// - If user is on another server and we do not have a local copy already fetch
 ///   `avatar_url` and blurhash over federation
 pub(crate) async fn get_avatar_url_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	body: Ruma<get_avatar_url::v3::Request>,
 ) -> Result<get_avatar_url::v3::Response> {
 	if !services.globals.user_is_local(&body.user_id) {
@@ -224,7 +224,7 @@ pub(crate) async fn get_avatar_url_route(
 /// - If user is on another server and we do not have a local copy already,
 ///   fetch profile over federation.
 pub(crate) async fn get_profile_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	body: Ruma<get_profile::v3::Request>,
 ) -> Result<get_profile::v3::Response> {
 	if !services.globals.user_is_local(&body.user_id) {

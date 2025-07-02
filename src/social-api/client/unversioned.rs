@@ -4,7 +4,7 @@ use axum::{Json, extract::State, response::IntoResponse};
 use conduwuit::Result;
 use futures::StreamExt;
 use ruma::api::client::discovery::get_supported_versions;
-
+use service::Services;
 use crate::Ruma;
 
 /// # `GET /_matrix/client/versions`
@@ -77,7 +77,7 @@ pub(crate) async fn conduwuit_server_version() -> Result<impl IntoResponse> {
 /// homeserver. Endpoint is disabled if federation is disabled for privacy. This
 /// only includes active users (not deactivated, no guests, etc)
 pub(crate) async fn conduwuit_local_user_count(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 ) -> Result<impl IntoResponse> {
 	let user_count = services.users.list_local_users().count().await;
 

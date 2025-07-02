@@ -264,7 +264,7 @@ async fn create_join_event(
 ///
 /// Submits a signed join event.
 pub(crate) async fn create_join_event_v1_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	body: Ruma<create_join_event::v1::Request>,
 ) -> Result<create_join_event::v1::Response> {
 	if services
@@ -310,7 +310,7 @@ pub(crate) async fn create_join_event_v1_route(
 ///
 /// Submits a signed join event.
 pub(crate) async fn create_join_event_v2_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	body: Ruma<create_join_event::v2::Request>,
 ) -> Result<create_join_event::v2::Response> {
 	if services

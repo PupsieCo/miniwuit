@@ -21,7 +21,7 @@ use crate::Ruma;
 	fields(%client)
 )]
 pub(crate) async fn get_content_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	InsecureClientIp(client): InsecureClientIp,
 	body: Ruma<get_content::v1::Request>,
 ) -> Result<get_content::v1::Response> {
@@ -63,7 +63,7 @@ pub(crate) async fn get_content_route(
 	fields(%client)
 )]
 pub(crate) async fn get_content_thumbnail_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	InsecureClientIp(client): InsecureClientIp,
 	body: Ruma<get_content_thumbnail::v1::Request>,
 ) -> Result<get_content_thumbnail::v1::Response> {

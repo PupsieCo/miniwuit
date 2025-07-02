@@ -34,7 +34,7 @@ use crate::Ruma;
 /// - If there are no device keys yet: Adds device keys (TODO: merge with
 ///   existing keys?)
 pub(crate) async fn upload_keys_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	body: Ruma<upload_keys::v3::Request>,
 ) -> Result<upload_keys::v3::Response> {
 	let (sender_user, sender_device) = body.sender();
@@ -123,7 +123,7 @@ pub(crate) async fn upload_keys_route(
 /// - The master and self-signing keys contain signatures that the user is
 ///   allowed to see
 pub(crate) async fn get_keys_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	body: Ruma<get_keys::v3::Request>,
 ) -> Result<get_keys::v3::Response> {
 	let sender_user = body.sender_user.as_ref().expect("user is authenticated");
@@ -142,7 +142,7 @@ pub(crate) async fn get_keys_route(
 ///
 /// Claims one-time keys
 pub(crate) async fn claim_keys_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	body: Ruma<claim_keys::v3::Request>,
 ) -> Result<claim_keys::v3::Response> {
 	claim_keys_helper(&services, &body.one_time_keys).await
@@ -154,7 +154,7 @@ pub(crate) async fn claim_keys_route(
 ///
 /// - Requires UIAA to verify password
 pub(crate) async fn upload_signing_keys_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	body: Ruma<upload_signing_keys::v3::Request>,
 ) -> Result<upload_signing_keys::v3::Response> {
 	let sender_user = body.sender_user.as_ref().expect("user is authenticated");
@@ -235,7 +235,7 @@ pub(crate) async fn upload_signing_keys_route(
 }
 
 async fn check_for_new_keys(
-	services: crate::State,
+	services: conduwuit_router::State<Services>,
 	user_id: &UserId,
 	self_signing_key: Option<&Raw<CrossSigningKey>>,
 	user_signing_key: Option<&Raw<CrossSigningKey>>,
@@ -312,7 +312,7 @@ async fn check_for_new_keys(
 /// it a bit to stop exploding the entire request on bad sigs, but needs way
 /// more work.
 pub(crate) async fn upload_signatures_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	body: Ruma<upload_signatures::v3::Request>,
 ) -> Result<upload_signatures::v3::Response> {
 	if body.signed_keys.is_empty() {
@@ -370,7 +370,7 @@ pub(crate) async fn upload_signatures_route(
 ///
 /// - TODO: left users
 pub(crate) async fn get_key_changes_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	body: Ruma<get_key_changes::v3::Request>,
 ) -> Result<get_key_changes::v3::Response> {
 	let sender_user = body.sender_user.as_ref().expect("user is authenticated");

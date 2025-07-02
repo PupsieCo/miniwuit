@@ -157,14 +157,6 @@ impl ServicesTrait for Services {
 	// }
 }
 
-impl RouterServices for Services {
-	type Guard = Guard<Services>;
-
-	fn build(router: Router<State<Self>>, _server: &Server) -> Router<State<Self>> {
-		router
-	}
-}
-
 #[allow(clippy::needless_pass_by_value)]
 fn add_service(map: &Arc<Map>, s: Arc<dyn Service>, a: Arc<dyn Any + Send + Sync>) {
 	let name = s.name();

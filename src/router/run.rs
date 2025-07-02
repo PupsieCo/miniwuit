@@ -19,7 +19,7 @@ use crate::{serve, RouterServices};
 
 /// Main loop base
 #[tracing::instrument(skip_all)]
-pub(crate) async fn run<R: RouterServices + Clone>(services: R) -> Result<()> {
+pub(crate) async fn run<R: RouterServices>(services: R::Services) -> Result<()> {
 	let server = &services.server();
 	debug!("Start");
 
@@ -36,7 +36,7 @@ pub(crate) async fn run<R: RouterServices + Clone>(services: R) -> Result<()> {
 	let mut listener =
 		server
 			.runtime()
-			.spawn(serve::serve(services.clone(), handle.clone(), tx.subscribe()));
+			.spawn(serve::serve::<R>(services.clone(), handle.clone(), tx.subscribe()));
 
 	// Focal point
 	debug!("Running");
@@ -58,10 +58,10 @@ pub(crate) async fn run<R: RouterServices + Clone>(services: R) -> Result<()> {
 
 /// Async initializations
 #[tracing::instrument(skip_all)]
-pub(crate) async fn start<R: ServicesTrait>(server: Arc<Server>) -> Result<R::BuildResult> {
+pub(crate) async fn start<S: ServicesTrait>(server: Arc<Server>) -> Result<S::BuildResult> {
 	debug!("Starting...");
 
-	let services = R::start(server).await?;
+	let services = S::start(server).await?;
 
 	#[cfg(all(feature = "systemd", target_os = "linux"))]
 	sd_notify::notify(true, &[sd_notify::NotifyState::Ready])
@@ -73,7 +73,7 @@ pub(crate) async fn start<R: ServicesTrait>(server: Arc<Server>) -> Result<R::Bu
 
 /// Async destructions
 #[tracing::instrument(skip_all)]
-pub(crate) async fn stop<R: ServicesTrait>(services: R) -> Result<()> {
+pub(crate) async fn stop<S: ServicesTrait>(services: S) -> Result<()> {
 	debug!("Shutting down...");
 
 	#[cfg(all(feature = "systemd", target_os = "linux"))]

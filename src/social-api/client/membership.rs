@@ -172,7 +172,7 @@ async fn banned_room_check(
 ///   federation
 #[tracing::instrument(skip_all, fields(%client), name = "join")]
 pub(crate) async fn join_room_by_id_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	InsecureClientIp(client): InsecureClientIp,
 	body: Ruma<join_room_by_id::v3::Request>,
 ) -> Result<join_room_by_id::v3::Response> {
@@ -241,7 +241,7 @@ pub(crate) async fn join_room_by_id_route(
 ///   via room alias server name and room ID server name
 #[tracing::instrument(skip_all, fields(%client), name = "join")]
 pub(crate) async fn join_room_by_id_or_alias_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	InsecureClientIp(client): InsecureClientIp,
 	body: Ruma<join_room_by_id_or_alias::v3::Request>,
 ) -> Result<join_room_by_id_or_alias::v3::Response> {
@@ -362,7 +362,7 @@ pub(crate) async fn join_room_by_id_or_alias_route(
 /// Tries to knock the room to ask permission to join for the sender user.
 #[tracing::instrument(skip_all, fields(%client), name = "knock")]
 pub(crate) async fn knock_room_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	InsecureClientIp(client): InsecureClientIp,
 	body: Ruma<knock_room::v3::Request>,
 ) -> Result<knock_room::v3::Response> {
@@ -473,7 +473,7 @@ pub(crate) async fn knock_room_route(
 ///
 /// - This should always work if the user is currently joined.
 pub(crate) async fn leave_room_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	body: Ruma<leave_room::v3::Request>,
 ) -> Result<leave_room::v3::Response> {
 	leave_room(&services, body.sender_user(), &body.room_id, body.reason.clone())
@@ -486,7 +486,7 @@ pub(crate) async fn leave_room_route(
 /// Tries to send an invite event into the room.
 #[tracing::instrument(skip_all, fields(%client), name = "invite")]
 pub(crate) async fn invite_user_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	InsecureClientIp(client): InsecureClientIp,
 	body: Ruma<invite_user::v3::Request>,
 ) -> Result<invite_user::v3::Response> {
@@ -562,7 +562,7 @@ pub(crate) async fn invite_user_route(
 ///
 /// Tries to send a kick event into the room.
 pub(crate) async fn kick_user_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	body: Ruma<kick_user::v3::Request>,
 ) -> Result<kick_user::v3::Response> {
 	let state_lock = services.rooms.state.mutex.lock(&body.room_id).await;
@@ -615,7 +615,7 @@ pub(crate) async fn kick_user_route(
 ///
 /// Tries to send a ban event into the room.
 pub(crate) async fn ban_user_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	body: Ruma<ban_user::v3::Request>,
 ) -> Result<ban_user::v3::Response> {
 	let sender_user = body.sender_user();
@@ -662,7 +662,7 @@ pub(crate) async fn ban_user_route(
 ///
 /// Tries to send an unban event into the room.
 pub(crate) async fn unban_user_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	body: Ruma<unban_user::v3::Request>,
 ) -> Result<unban_user::v3::Response> {
 	let state_lock = services.rooms.state.mutex.lock(&body.room_id).await;
@@ -714,7 +714,7 @@ pub(crate) async fn unban_user_route(
 /// Note: Other devices of the user have no way of knowing the room was
 /// forgotten, so this has to be called from every device
 pub(crate) async fn forget_room_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	body: Ruma<forget_room::v3::Request>,
 ) -> Result<forget_room::v3::Response> {
 	let user_id = body.sender_user();
@@ -756,7 +756,7 @@ pub(crate) async fn forget_room_route(
 ///
 /// Lists all rooms the user has joined.
 pub(crate) async fn joined_rooms_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	body: Ruma<joined_rooms::v3::Request>,
 ) -> Result<joined_rooms::v3::Response> {
 	Ok(joined_rooms::v3::Response {
@@ -825,7 +825,7 @@ fn membership_filter(
 ///
 /// - Only works if the user is currently joined
 pub(crate) async fn get_member_events_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	body: Ruma<get_member_events::v3::Request>,
 ) -> Result<get_member_events::v3::Response> {
 	let sender_user = body.sender_user();
@@ -863,7 +863,7 @@ pub(crate) async fn get_member_events_route(
 /// - The sender user must be in the room
 /// - TODO: An appservice just needs a puppet joined
 pub(crate) async fn joined_members_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	body: Ruma<joined_members::v3::Request>,
 ) -> Result<joined_members::v3::Response> {
 	let sender_user = body.sender_user();

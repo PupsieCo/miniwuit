@@ -8,12 +8,12 @@ use conduwuit::Result;
 use futures::{Future, TryFutureExt};
 use http::Method;
 use ruma::api::IncomingRequest;
-
+use service::Services;
 use super::{Ruma, RumaResponse, State};
 
 pub(in super::super) trait RumaHandler<T> {
-	fn add_route(&'static self, router: Router<State>, path: &str) -> Router<State>;
-	fn add_routes(&'static self, router: Router<State>) -> Router<State>;
+	fn add_route(&'static self, router: Router<State<Services>>, path: &str) -> Router<State<Services>>;
+	fn add_routes(&'static self, router: Router<State<Services>>) -> Router<State<Services>>;
 }
 
 pub(in super::super) trait RouterExt {
@@ -22,7 +22,7 @@ pub(in super::super) trait RouterExt {
 		H: RumaHandler<T>;
 }
 
-impl RouterExt for Router<State> {
+impl RouterExt for Router<State<Services>> {
 	fn ruma_route<H, T>(self, handler: &'static H) -> Self
 	where
 		H: RumaHandler<T>,
@@ -41,16 +41,16 @@ macro_rules! ruma_handler {
 			Req: IncomingRequest + Send + Sync + 'static,
 			Err: IntoResponse + Send,
 			<Req as IncomingRequest>::OutgoingResponse: Send,
-			$( $tx: FromRequestParts<State> + Send + Sync + 'static, )*
+			$( $tx: FromRequestParts<State<Services>> + Send + Sync + 'static, )*
 		{
-			fn add_routes(&'static self, router: Router<State>) -> Router<State> {
+			fn add_routes(&'static self, router: Router<State<Services>>) -> Router<State<Services>> {
 				Req::METADATA
 					.history
 					.all_paths()
 					.fold(router, |router, path| self.add_route(router, path))
 			}
 
-			fn add_route(&'static self, router: Router<State>, path: &str) -> Router<State> {
+			fn add_route(&'static self, router: Router<State<Services>>, path: &str) -> Router<State<Services>> {
 				let action = |$($tx,)* req| self($($tx,)* req).map_ok(RumaResponse);
 				let method = method_to_filter(&Req::METADATA.method);
 				router.route(path, on(method, action))

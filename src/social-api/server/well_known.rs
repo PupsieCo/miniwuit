@@ -8,7 +8,7 @@ use crate::Ruma;
 ///
 /// Returns the .well-known URL if it is configured, otherwise returns 404.
 pub(crate) async fn well_known_server(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	_body: Ruma<discover_homeserver::Request>,
 ) -> Result<discover_homeserver::Response> {
 	Ok(discover_homeserver::Response {

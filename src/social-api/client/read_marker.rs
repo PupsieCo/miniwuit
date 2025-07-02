@@ -21,7 +21,7 @@ use crate::Ruma;
 /// - If `read_receipt` is set: Update private marker and public read receipt
 ///   EDU
 pub(crate) async fn set_read_marker_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	body: Ruma<set_read_marker::v3::Request>,
 ) -> Result<set_read_marker::v3::Response> {
 	let sender_user = body.sender_user();
@@ -110,7 +110,7 @@ pub(crate) async fn set_read_marker_route(
 ///
 /// Sets private read marker and public read receipt EDU.
 pub(crate) async fn create_receipt_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	body: Ruma<create_receipt::v3::Request>,
 ) -> Result<create_receipt::v3::Response> {
 	let sender_user = body.sender_user();

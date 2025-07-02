@@ -33,7 +33,7 @@ const CONDUWUIT_CSP: &[&str; 5] = &[
 
 const CONDUWUIT_PERMISSIONS_POLICY: &[&str; 2] = &["interest-cohort=()", "browsing-topics=()"];
 
-pub(crate) fn build<R: RouterServices + Clone>(services: R) -> Result<(Router, R::Guard)> {
+pub(crate) fn build<R: RouterServices>(services: R::Services) -> Result<(Router, R::Guard)> {
 	let server = &services.server();
 	let layers = ServiceBuilder::new();
 
@@ -57,7 +57,7 @@ pub(crate) fn build<R: RouterServices + Clone>(services: R) -> Result<(Router, R
 				.on_request(DefaultOnRequest::new().level(Level::TRACE))
 				.on_response(DefaultOnResponse::new().level(Level::DEBUG)),
 		)
-		.layer(axum::middleware::from_fn_with_state(services.clone(), request::handle::<R>))
+		.layer(axum::middleware::from_fn_with_state(services.clone(), request::handle::<R::Services>))
 		.layer(SecureClientIpSource::ConnectInfo.into_extension())
 		.layer(ResponseBodyTimeoutLayer::new(Duration::from_secs(
 			server.config.client_response_timeout,
@@ -94,7 +94,7 @@ pub(crate) fn build<R: RouterServices + Clone>(services: R) -> Result<(Router, R
 		.layer(body_limit_layer(server))
 		.layer(CatchPanicLayer::custom(move |panic| catch_panic(panic, services_.clone())));
 
-	let (router, guard) = router::build(&services);
+	let (router, guard) = router::build::<R>(services);
 	Ok((router.layer(layers), guard))
 }
 

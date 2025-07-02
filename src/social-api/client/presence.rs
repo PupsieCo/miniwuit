@@ -10,7 +10,7 @@ use crate::Ruma;
 ///
 /// Sets the presence state of the sender user.
 pub(crate) async fn set_presence_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	body: Ruma<set_presence::v3::Request>,
 ) -> Result<set_presence::v3::Response> {
 	if !services.config.allow_local_presence {
@@ -35,7 +35,7 @@ pub(crate) async fn set_presence_route(
 ///
 /// - Only works if you share a room with the user
 pub(crate) async fn get_presence_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	body: Ruma<get_presence::v3::Request>,
 ) -> Result<get_presence::v3::Response> {
 	if !services.config.allow_local_presence {

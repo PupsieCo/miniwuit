@@ -18,7 +18,7 @@ use crate::{Ruma, client::DEVICE_ID_LENGTH};
 ///
 /// Get metadata on all devices of the sender user.
 pub(crate) async fn get_devices_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	body: Ruma<get_devices::v3::Request>,
 ) -> Result<get_devices::v3::Response> {
 	let sender_user = body.sender_user.as_ref().expect("user is authenticated");
@@ -36,7 +36,7 @@ pub(crate) async fn get_devices_route(
 ///
 /// Get metadata on a single device of the sender user.
 pub(crate) async fn get_device_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	body: Ruma<get_device::v3::Request>,
 ) -> Result<get_device::v3::Response> {
 	let sender_user = body.sender_user.as_ref().expect("user is authenticated");
@@ -55,7 +55,7 @@ pub(crate) async fn get_device_route(
 /// Updates the metadata on a given device of the sender user.
 #[tracing::instrument(skip_all, fields(%client), name = "update_device")]
 pub(crate) async fn update_device_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	InsecureClientIp(client): InsecureClientIp,
 	body: Ruma<update_device::v3::Request>,
 ) -> Result<update_device::v3::Response> {
@@ -124,7 +124,7 @@ pub(crate) async fn update_device_route(
 /// - Forgets to-device events
 /// - Triggers device list updates
 pub(crate) async fn delete_device_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	body: Ruma<delete_device::v3::Request>,
 ) -> Result<delete_device::v3::Response> {
 	let (sender_user, sender_device) = body.sender();
@@ -201,7 +201,7 @@ pub(crate) async fn delete_device_route(
 /// - Forgets to-device events
 /// - Triggers device list updates
 pub(crate) async fn delete_devices_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	body: Ruma<delete_devices::v3::Request>,
 ) -> Result<delete_devices::v3::Response> {
 	let (sender_user, sender_device) = body.sender();

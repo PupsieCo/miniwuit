@@ -117,7 +117,7 @@ type PresenceUpdates = HashMap<OwnedUserId, PresenceEventContent>;
     )
 )]
 pub(crate) async fn sync_events_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	body: Ruma<sync_events::v3::Request>,
 ) -> Result<sync_events::v3::Response, RumaResponse<UiaaResponse>> {
 	let (sender_user, sender_device) = body.sender();

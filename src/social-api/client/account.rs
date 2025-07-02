@@ -52,7 +52,7 @@ const RANDOM_USER_ID_LENGTH: usize = 10;
 /// invalid when trying to register
 #[tracing::instrument(skip_all, fields(%client), name = "register_available")]
 pub(crate) async fn get_register_available_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	InsecureClientIp(client): InsecureClientIp,
 	body: Ruma<get_username_availability::v3::Request>,
 ) -> Result<get_username_availability::v3::Response> {
@@ -141,7 +141,7 @@ pub(crate) async fn get_register_available_route(
 #[allow(clippy::doc_markdown)]
 #[tracing::instrument(skip_all, fields(%client), name = "register")]
 pub(crate) async fn register_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	InsecureClientIp(client): InsecureClientIp,
 	body: Ruma<register::v3::Request>,
 ) -> Result<register::v3::Response> {
@@ -574,7 +574,7 @@ pub(crate) async fn register_route(
 /// - Triggers device list updates
 #[tracing::instrument(skip_all, fields(%client), name = "change_password")]
 pub(crate) async fn change_password_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	InsecureClientIp(client): InsecureClientIp,
 	body: Ruma<change_password::v3::Request>,
 ) -> Result<change_password::v3::Response> {
@@ -677,7 +677,7 @@ pub(crate) async fn change_password_route(
 ///
 /// Note: Also works for Application Services
 pub(crate) async fn whoami_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	body: Ruma<whoami::v3::Request>,
 ) -> Result<whoami::v3::Response> {
 	let sender_user = body.sender_user.as_ref().expect("user is authenticated");
@@ -704,7 +704,7 @@ pub(crate) async fn whoami_route(
 /// - Removes ability to log in again
 #[tracing::instrument(skip_all, fields(%client), name = "deactivate")]
 pub(crate) async fn deactivate_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	InsecureClientIp(client): InsecureClientIp,
 	body: Ruma<deactivate::v3::Request>,
 ) -> Result<deactivate::v3::Response> {
@@ -828,7 +828,7 @@ pub(crate) async fn request_3pid_management_token_via_msisdn_route(
 /// Currently does not have any ratelimiting, and this isn't very practical as
 /// there is only one registration token allowed.
 pub(crate) async fn check_registration_token_validity(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	body: Ruma<check_registration_token_validity::v1::Request>,
 ) -> Result<check_registration_token_validity::v1::Response> {
 	let Some(reg_token) = services.globals.registration_token.clone() else {

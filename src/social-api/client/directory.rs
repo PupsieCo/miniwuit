@@ -46,7 +46,7 @@ use crate::Ruma;
 /// - Rooms are ordered by the number of joined members
 #[tracing::instrument(skip_all, fields(%client), name = "publicrooms")]
 pub(crate) async fn get_public_rooms_filtered_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	InsecureClientIp(client): InsecureClientIp,
 	body: Ruma<get_public_rooms_filtered::v3::Request>,
 ) -> Result<get_public_rooms_filtered::v3::Response> {
@@ -87,7 +87,7 @@ pub(crate) async fn get_public_rooms_filtered_route(
 /// - Rooms are ordered by the number of joined members
 #[tracing::instrument(skip_all, fields(%client), name = "publicrooms")]
 pub(crate) async fn get_public_rooms_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	InsecureClientIp(client): InsecureClientIp,
 	body: Ruma<get_public_rooms::v3::Request>,
 ) -> Result<get_public_rooms::v3::Response> {
@@ -131,7 +131,7 @@ pub(crate) async fn get_public_rooms_route(
 /// Sets the visibility of a given room in the room directory.
 #[tracing::instrument(skip_all, fields(%client), name = "room_directory")]
 pub(crate) async fn set_room_visibility_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	InsecureClientIp(client): InsecureClientIp,
 	body: Ruma<set_room_visibility::v3::Request>,
 ) -> Result<set_room_visibility::v3::Response> {
@@ -210,7 +210,7 @@ pub(crate) async fn set_room_visibility_route(
 ///
 /// Gets the visibility of a given room in the room directory.
 pub(crate) async fn get_room_visibility_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	body: Ruma<get_room_visibility::v3::Request>,
 ) -> Result<get_room_visibility::v3::Response> {
 	if !services.rooms.metadata.exists(&body.room_id).await {

@@ -31,7 +31,7 @@ const LIMIT_DEFAULT: usize = 10;
 /// - Only works if the user is joined (TODO: always allow, but only show events
 ///   if the user was joined, depending on history_visibility)
 pub(crate) async fn get_context_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	body: Ruma<get_context::v3::Request>,
 ) -> Result<get_context::v3::Response> {
 	let sender = body.sender();

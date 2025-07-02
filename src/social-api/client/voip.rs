@@ -17,7 +17,7 @@ type HmacSha1 = Hmac<Sha1>;
 ///
 /// TODO: Returns information about the recommended turn server.
 pub(crate) async fn turn_server_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	body: Ruma<get_turn_server_info::v3::Request>,
 ) -> Result<get_turn_server_info::v3::Response> {
 	// MSC4166: return M_NOT_FOUND 404 if no TURN URIs are specified in any way

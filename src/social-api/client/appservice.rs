@@ -9,7 +9,7 @@ use crate::Ruma;
 /// Ask the homeserver to ping the application service to ensure the connection
 /// works.
 pub(crate) async fn appservice_ping(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	body: Ruma<request_ping::v1::Request>,
 ) -> Result<request_ping::v1::Response> {
 	let appservice_info = body.appservice_info.as_ref().ok_or_else(|| {

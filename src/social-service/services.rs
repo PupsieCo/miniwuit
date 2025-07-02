@@ -8,7 +8,6 @@ use std::{
 	sync::{Arc, RwLock},
 };
 use tokio::sync::Mutex;
-use conduwuit_router::{Guard, Router, RouterServices, State};
 use crate::{
 	account_data, admin, appservice, client, emergency, federation, globals, key_backups, media,
 	presence, pusher, resolver, rooms, sending, server_keys, sync, transaction_ids, uiaa,

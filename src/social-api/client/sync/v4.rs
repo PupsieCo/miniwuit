@@ -45,7 +45,7 @@ pub(crate) const SINGLE_CONNECTION_SYNC: &str = "single_connection_sync";
 ///
 /// Sliding Sync endpoint (future endpoint: `/_matrix/client/v4/sync`)
 pub(crate) async fn sync_events_v4_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	body: Ruma<sync_events::v4::Request>,
 ) -> Result<sync_events::v4::Response> {
 	debug_assert!(DEFAULT_BUMP_TYPES.is_sorted(), "DEFAULT_BUMP_TYPES is not sorted");

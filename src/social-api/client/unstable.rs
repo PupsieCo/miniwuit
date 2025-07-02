@@ -32,7 +32,7 @@ use crate::Ruma;
 /// An implementation of [MSC2666](https://github.com/matrix-org/matrix-spec-proposals/pull/2666)
 #[tracing::instrument(skip_all, fields(%client), name = "mutual_rooms")]
 pub(crate) async fn get_mutual_rooms_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	InsecureClientIp(client): InsecureClientIp,
 	body: Ruma<mutual_rooms::unstable::Request>,
 ) -> Result<mutual_rooms::unstable::Response> {
@@ -66,7 +66,7 @@ pub(crate) async fn get_mutual_rooms_route(
 ///
 /// - Also makes sure other users receive the update using presence EDUs
 pub(crate) async fn delete_timezone_key_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	body: Ruma<delete_timezone_key::unstable::Request>,
 ) -> Result<delete_timezone_key::unstable::Response> {
 	let sender_user = body.sender_user.as_ref().expect("user is authenticated");
@@ -94,7 +94,7 @@ pub(crate) async fn delete_timezone_key_route(
 ///
 /// - Also makes sure other users receive the update using presence EDUs
 pub(crate) async fn set_timezone_key_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	body: Ruma<set_timezone_key::unstable::Request>,
 ) -> Result<set_timezone_key::unstable::Response> {
 	let sender_user = body.sender_user.as_ref().expect("user is authenticated");
@@ -122,7 +122,7 @@ pub(crate) async fn set_timezone_key_route(
 ///
 /// This also handles the avatar_url and displayname being updated.
 pub(crate) async fn set_profile_key_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	body: Ruma<set_profile_key::unstable::Request>,
 ) -> Result<set_profile_key::unstable::Response> {
 	let sender_user = body.sender_user.as_ref().expect("user is authenticated");
@@ -215,7 +215,7 @@ pub(crate) async fn set_profile_key_route(
 ///
 /// This also handles the avatar_url and displayname being updated.
 pub(crate) async fn delete_profile_key_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	body: Ruma<delete_profile_key::unstable::Request>,
 ) -> Result<delete_profile_key::unstable::Response> {
 	let sender_user = body.sender_user.as_ref().expect("user is authenticated");
@@ -275,7 +275,7 @@ pub(crate) async fn delete_profile_key_route(
 /// - If user is on another server and we do not have a local copy already fetch
 ///   `timezone` over federation
 pub(crate) async fn get_timezone_key_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	body: Ruma<get_timezone_key::unstable::Request>,
 ) -> Result<get_timezone_key::unstable::Response> {
 	if !services.globals.user_is_local(&body.user_id) {
@@ -333,7 +333,7 @@ pub(crate) async fn get_timezone_key_route(
 /// - If user is on another server and we do not have a local copy already fetch
 ///   `timezone` over federation
 pub(crate) async fn get_profile_key_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	body: Ruma<get_profile_key::unstable::Request>,
 ) -> Result<get_profile_key::unstable::Response> {
 	let mut profile_key_value: BTreeMap<String, serde_json::Value> = BTreeMap::new();

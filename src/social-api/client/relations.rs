@@ -22,7 +22,7 @@ use crate::Ruma;
 
 /// # `GET /_matrix/client/r0/rooms/{roomId}/relations/{eventId}/{relType}/{eventType}`
 pub(crate) async fn get_relating_events_with_rel_type_and_event_type_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	body: Ruma<get_relating_events_with_rel_type_and_event_type::v1::Request>,
 ) -> Result<get_relating_events_with_rel_type_and_event_type::v1::Response> {
 	paginate_relations_with_filter(
@@ -49,7 +49,7 @@ pub(crate) async fn get_relating_events_with_rel_type_and_event_type_route(
 
 /// # `GET /_matrix/client/r0/rooms/{roomId}/relations/{eventId}/{relType}`
 pub(crate) async fn get_relating_events_with_rel_type_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	body: Ruma<get_relating_events_with_rel_type::v1::Request>,
 ) -> Result<get_relating_events_with_rel_type::v1::Response> {
 	paginate_relations_with_filter(
@@ -76,7 +76,7 @@ pub(crate) async fn get_relating_events_with_rel_type_route(
 
 /// # `GET /_matrix/client/r0/rooms/{roomId}/relations/{eventId}`
 pub(crate) async fn get_relating_events_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	body: Ruma<get_relating_events::v1::Request>,
 ) -> Result<get_relating_events::v1::Response> {
 	paginate_relations_with_filter(

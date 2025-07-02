@@ -8,7 +8,9 @@ pub mod server;
 extern crate conduwuit_core as conduwuit;
 extern crate conduwuit_social_service as service;
 
-pub(crate) use self::router::{Ruma, RumaResponse, State};
+pub(crate) use self::router::{Ruma, RumaResponse};
+
+pub use router::SocialApiRouter;
 
 conduwuit::mod_ctor! {}
 conduwuit::mod_dtor! {}

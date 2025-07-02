@@ -14,7 +14,7 @@ use crate::Ruma;
 ///
 /// Creates a new room alias on this server.
 pub(crate) async fn create_alias_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	body: Ruma<create_alias::v3::Request>,
 ) -> Result<create_alias::v3::Response> {
 	let sender_user = body.sender_user.as_ref().expect("user is authenticated");
@@ -59,7 +59,7 @@ pub(crate) async fn create_alias_route(
 ///
 /// - TODO: Update canonical alias event
 pub(crate) async fn delete_alias_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	body: Ruma<delete_alias::v3::Request>,
 ) -> Result<delete_alias::v3::Response> {
 	let sender_user = body.sender_user.as_ref().expect("user is authenticated");
@@ -85,7 +85,7 @@ pub(crate) async fn delete_alias_route(
 ///
 /// Resolve an alias locally or over federation.
 pub(crate) async fn get_alias_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	body: Ruma<get_alias::v3::Request>,
 ) -> Result<get_alias::v3::Response> {
 	let room_alias = body.body.room_alias;

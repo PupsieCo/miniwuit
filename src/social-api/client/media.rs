@@ -26,7 +26,7 @@ use crate::Ruma;
 
 /// # `GET /_matrix/client/v1/media/config`
 pub(crate) async fn get_media_config_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	_body: Ruma<get_media_config::v1::Request>,
 ) -> Result<get_media_config::v1::Response> {
 	Ok(get_media_config::v1::Response {
@@ -47,7 +47,7 @@ pub(crate) async fn get_media_config_route(
 	fields(%client),
 )]
 pub(crate) async fn create_content_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	InsecureClientIp(client): InsecureClientIp,
 	body: Ruma<create_content::v3::Request>,
 ) -> Result<create_content::v3::Response> {
@@ -90,7 +90,7 @@ pub(crate) async fn create_content_route(
 	fields(%client),
 )]
 pub(crate) async fn get_content_thumbnail_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	InsecureClientIp(client): InsecureClientIp,
 	body: Ruma<get_content_thumbnail::v1::Request>,
 ) -> Result<get_content_thumbnail::v1::Response> {
@@ -127,7 +127,7 @@ pub(crate) async fn get_content_thumbnail_route(
 	fields(%client),
 )]
 pub(crate) async fn get_content_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	InsecureClientIp(client): InsecureClientIp,
 	body: Ruma<get_content::v1::Request>,
 ) -> Result<get_content::v1::Response> {
@@ -163,7 +163,7 @@ pub(crate) async fn get_content_route(
 	fields(%client),
 )]
 pub(crate) async fn get_content_as_filename_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	InsecureClientIp(client): InsecureClientIp,
 	body: Ruma<get_content_as_filename::v1::Request>,
 ) -> Result<get_content_as_filename::v1::Response> {
@@ -199,7 +199,7 @@ pub(crate) async fn get_content_as_filename_route(
 	fields(%client),
 )]
 pub(crate) async fn get_media_preview_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	InsecureClientIp(client): InsecureClientIp,
 	body: Ruma<get_media_preview::v1::Request>,
 ) -> Result<get_media_preview::v1::Response> {

@@ -53,7 +53,7 @@ use crate::{Ruma, client::invite_helper};
 /// - Send invite events
 #[allow(clippy::large_stack_frames)]
 pub(crate) async fn create_room_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	body: Ruma<create_room::v3::Request>,
 ) -> Result<create_room::v3::Response> {
 	use create_room::v3::RoomPreset;

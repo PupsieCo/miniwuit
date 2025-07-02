@@ -14,7 +14,7 @@ use crate::Ruma;
 ///
 /// Creates a knock template.
 pub(crate) async fn create_knock_event_template_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	body: Ruma<create_knock_event_template::v1::Request>,
 ) -> Result<create_knock_event_template::v1::Response> {
 	if !services.rooms.metadata.exists(&body.room_id).await {

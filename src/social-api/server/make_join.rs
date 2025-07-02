@@ -23,7 +23,7 @@ use crate::Ruma;
 ///
 /// Creates a join template.
 pub(crate) async fn create_join_event_template_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	body: Ruma<prepare_join_event::v1::Request>,
 ) -> Result<prepare_join_event::v1::Response> {
 	if !services.rooms.metadata.exists(&body.room_id).await {

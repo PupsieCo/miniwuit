@@ -12,8 +12,8 @@ use service::ServicesTrait;
 use super::{layers, RouterServices};
 
 /// Serve clients
-pub(super) async fn serve<R: RouterServices + Clone>(
-	services: R,
+pub(super) async fn serve<R: RouterServices>(
+	services: R::Services,
 	handle: ServerHandle,
 	mut shutdown: broadcast::Receiver<()>,
 ) -> Result {
@@ -27,7 +27,7 @@ pub(super) async fn serve<R: RouterServices + Clone>(
 	}
 
 	let addrs = config.get_bind_addrs();
-	let (app, _guard) = layers::build(services)?;
+	let (app, _guard) = layers::build::<R>(services)?;
 	if cfg!(unix) && config.unix_socket_path.is_some() {
 		unix::serve(server, app, shutdown).await
 	} else if config.tls.certs.is_some() {

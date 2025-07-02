@@ -14,7 +14,7 @@ const LIMIT_DEFAULT: usize = 10;
 ///
 /// Retrieves events that the sender is missing.
 pub(crate) async fn get_missing_events_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	body: Ruma<get_missing_events::v1::Request>,
 ) -> Result<get_missing_events::v1::Response> {
 	AccessCheck {

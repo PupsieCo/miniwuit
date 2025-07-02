@@ -12,7 +12,7 @@ use crate::Ruma;
 ///
 /// - TODO: Handle txn id
 pub(crate) async fn redact_event_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	body: Ruma<redact_event::v3::Request>,
 ) -> Result<redact_event::v3::Response> {
 	let sender_user = body.sender_user.as_ref().expect("user is authenticated");

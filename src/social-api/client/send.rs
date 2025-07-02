@@ -17,7 +17,7 @@ use crate::Ruma;
 /// - Tries to send the event into the room, auth rules will determine if it is
 ///   allowed
 pub(crate) async fn send_message_event_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	body: Ruma<send_message_event::v3::Request>,
 ) -> Result<send_message_event::v3::Response> {
 	let sender_user = body.sender_user();

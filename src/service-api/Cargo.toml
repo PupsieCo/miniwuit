@@ -1,5 +1,5 @@
 [package]
-name = "conduwuit_social_api"
+name = "conduwuit_service_api"
 categories.workspace = true
 description.workspace = true
 edition.workspace = true
@@ -43,7 +43,7 @@ base64.workspace = true
 bytes.workspace = true
 conduwuit-core.workspace = true
 conduwuit-database.workspace = true
-conduwuit-social-service.workspace = true
+conduwuit-service.workspace = true
 conduwuit-router.workspace = true
 const-str.workspace = true
 futures.workspace = true

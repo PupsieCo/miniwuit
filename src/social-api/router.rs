@@ -3,23 +3,38 @@ mod auth;
 mod handler;
 mod request;
 mod response;
-pub mod state;
 
-use std::str::FromStr;
-
+use self::handler::RouterExt;
+pub(super) use self::{args::Args as Ruma, response::RumaResponse};
+use crate::{client, server};
 use axum::{
 	Router,
 	response::{IntoResponse, Redirect},
 	routing::{any, get, post},
 };
 use conduwuit::{Server, err};
+use conduwuit_router::{Guard, RouterServices, State};
 use http::{Uri, uri};
+use service::Services;
+use std::str::FromStr;
+use std::sync::Arc;
 
-use self::handler::RouterExt;
-pub(super) use self::{args::Args as Ruma, response::RumaResponse, state::State};
-use crate::{client, server};
+pub struct SocialApiRouter;
 
-pub fn build(router: Router<State>, server: &Server) -> Router<State> {
+impl RouterServices for SocialApiRouter {
+	type Services = Arc<Services>;
+	type Guard = Guard<Services>;
+
+	fn build(services: Self::Services) -> (Router, Self::Guard) {
+		let server = services.server.clone();
+		let router = Router::<State<Services>>::new();
+		let (state, guard) = conduwuit_router::state::create(services);
+		let router = build(router, &server).with_state(state);
+		(router, guard)
+	}
+}
+
+pub fn build(router: Router<State<Services>>, server: &Server) -> Router<State<Services>> {
 	let config = &server.config;
 	let mut router = router
         .ruma_route(&client::get_timezone_key_route)

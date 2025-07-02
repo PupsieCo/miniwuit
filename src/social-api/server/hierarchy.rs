@@ -16,7 +16,7 @@ use crate::Ruma;
 /// Gets the space tree in a depth-first manner to locate child rooms of a given
 /// space.
 pub(crate) async fn get_hierarchy_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	body: Ruma<get_hierarchy::v1::Request>,
 ) -> Result<get_hierarchy::v1::Response> {
 	if !services.rooms.metadata.exists(&body.room_id).await {

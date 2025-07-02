@@ -22,7 +22,7 @@ use crate::Ruma;
 ///
 /// Submits a signed knock event.
 pub(crate) async fn create_knock_event_v1_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	body: Ruma<send_knock::v1::Request>,
 ) -> Result<send_knock::v1::Response> {
 	if services

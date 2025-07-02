@@ -611,6 +611,11 @@ package = "conduwuit_service_core"
 path = "src/service-core"
 default-features = false
 
+[workspace.dependencies.conduwuit-service-api]
+package = "conduwuit_service_api"
+path = "src/service-api"
+default-features = false
+
 [workspace.dependencies.conduwuit-social-admin]
 package = "conduwuit_social_admin"
 path = "src/social-admin"

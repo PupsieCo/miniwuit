@@ -5,7 +5,7 @@ use crate::RouterServices;
 use http::{StatusCode, Uri};
 use ruma::api::client::error::ErrorKind;
 
-pub(crate) fn build<R: RouterServices>(services: &R) -> (Router, R::Guard) {
+pub(crate) fn build<R: RouterServices>(services: R::Services) -> (Router, R::Guard) {
 	// let router = Router::<state::State>::new();
 	// let (state, guard) = state::create(services.clone());
 	// let router = conduwuit_social_api::router::build(router, &services.server)
@@ -14,5 +14,5 @@ pub(crate) fn build<R: RouterServices>(services: &R) -> (Router, R::Guard) {
 	// 	.with_state(state);
 	// 
 	// (router, guard)
-	services.arc_build()
+	R::build(services)
 }

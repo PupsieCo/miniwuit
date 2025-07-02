@@ -23,7 +23,7 @@ use crate::Ruma;
 /// Reports an abusive room to homeserver admins
 #[tracing::instrument(skip_all, fields(%client), name = "report_room")]
 pub(crate) async fn report_room_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	InsecureClientIp(client): InsecureClientIp,
 	body: Ruma<report_room::v3::Request>,
 ) -> Result<report_room::v3::Response> {
@@ -77,7 +77,7 @@ pub(crate) async fn report_room_route(
 /// Reports an inappropriate event to homeserver admins
 #[tracing::instrument(skip_all, fields(%client), name = "report_event")]
 pub(crate) async fn report_event_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	InsecureClientIp(client): InsecureClientIp,
 	body: Ruma<report_content::v3::Request>,
 ) -> Result<report_content::v3::Response> {

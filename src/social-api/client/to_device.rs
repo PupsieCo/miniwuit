@@ -18,7 +18,7 @@ use crate::Ruma;
 ///
 /// Send a to-device event to a set of client devices.
 pub(crate) async fn send_event_to_device_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	body: Ruma<send_event_to_device::v3::Request>,
 ) -> Result<send_event_to_device::v3::Response> {
 	let sender_user = body.sender_user.as_ref().expect("user is authenticated");

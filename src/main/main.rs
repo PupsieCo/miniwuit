@@ -45,7 +45,11 @@ fn main() -> Result {
 async fn async_main(server: &Arc<Server>) -> Result<(), Error> {
 	extern crate conduwuit_router as router;
 
-	match router::start(&server.server).await {
+	match router::start::<(conduwuit_service::Services, conduwuit_social_service::Services)>(
+		&server.server,
+	)
+	.await
+	{
 		| Ok((core_services, social_services)) => {
 			server.core_services.lock().await.insert(core_services);
 			server.social_services.lock().await.insert(social_services);
@@ -56,27 +60,32 @@ async fn async_main(server: &Arc<Server>) -> Result<(), Error> {
 		},
 	};
 
-	if let Err(error) = router::run((
+	if let Err(error) = router::run::<(
+		conduwuit_service_api::ServiceApiRouter,
+		conduwuit_social_api::SocialApiRouter,
+	)>((
 		server
 			.core_services
 			.lock()
 			.await
 			.as_ref()
-			.expect("core services initialized"),
+			.expect("core services initialized")
+			.clone(),
 		server
 			.social_services
 			.lock()
 			.await
 			.as_ref()
-			.expect("social services initialized")),
-	)
+			.expect("social services initialized")
+			.clone(),
+	))
 	.await
 	{
 		error!("Critical error running server: {error}");
 		return Err(error);
 	}
 
-	if let Err(error) = router::stop(
+	if let Err(error) = router::stop((
 		server
 			.core_services
 			.lock()
@@ -89,7 +98,7 @@ async fn async_main(server: &Arc<Server>) -> Result<(), Error> {
 			.await
 			.take()
 			.expect("social services stopped"),
-	)
+	))
 	.await
 	{
 		error!("Critical error stopping server: {error}");

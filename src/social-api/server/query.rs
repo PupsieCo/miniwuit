@@ -19,7 +19,7 @@ use crate::Ruma;
 ///
 /// Resolve a room alias to a room id.
 pub(crate) async fn get_room_information_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	body: Ruma<get_room_information::v1::Request>,
 ) -> Result<get_room_information::v1::Response> {
 	let room_id = services
@@ -59,7 +59,7 @@ pub(crate) async fn get_room_information_route(
 ///
 /// Gets information on a profile.
 pub(crate) async fn get_profile_information_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	body: Ruma<get_profile_information::v1::Request>,
 ) -> Result<get_profile_information::v1::Response> {
 	if !services

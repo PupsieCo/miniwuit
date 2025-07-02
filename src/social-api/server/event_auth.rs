@@ -17,7 +17,7 @@ use crate::Ruma;
 ///
 /// - This does not include the event itself
 pub(crate) async fn get_event_authorization_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	body: Ruma<get_event_authorization::v1::Request>,
 ) -> Result<get_event_authorization::v1::Response> {
 	AccessCheck {

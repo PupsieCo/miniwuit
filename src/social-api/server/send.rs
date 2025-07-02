@@ -56,7 +56,7 @@ type Pdu = (OwnedRoomId, OwnedEventId, CanonicalJsonObject);
 	),
 )]
 pub(crate) async fn send_transaction_message_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	InsecureClientIp(client): InsecureClientIp,
 	body: Ruma<send_transaction_message::v1::Request>,
 ) -> Result<send_transaction_message::v1::Response> {

@@ -13,7 +13,7 @@ use crate::Ruma;
 ///
 /// Creates a leave template.
 pub(crate) async fn create_leave_event_template_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	body: Ruma<prepare_leave_event::v1::Request>,
 ) -> Result<prepare_leave_event::v1::Response> {
 	if !services.rooms.metadata.exists(&body.room_id).await {

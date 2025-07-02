@@ -22,7 +22,7 @@ use crate::Ruma;
 ///
 /// Sets some account data for the sender user.
 pub(crate) async fn set_global_account_data_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	body: Ruma<set_global_account_data::v3::Request>,
 ) -> Result<set_global_account_data::v3::Response> {
 	let sender_user = body.sender_user();
@@ -47,7 +47,7 @@ pub(crate) async fn set_global_account_data_route(
 ///
 /// Sets some room account data for the sender user.
 pub(crate) async fn set_room_account_data_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	body: Ruma<set_room_account_data::v3::Request>,
 ) -> Result<set_room_account_data::v3::Response> {
 	let sender_user = body.sender_user();
@@ -72,7 +72,7 @@ pub(crate) async fn set_room_account_data_route(
 ///
 /// Gets some account data for the sender user.
 pub(crate) async fn get_global_account_data_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	body: Ruma<get_global_account_data::v3::Request>,
 ) -> Result<get_global_account_data::v3::Response> {
 	let sender_user = body.sender_user();
@@ -94,7 +94,7 @@ pub(crate) async fn get_global_account_data_route(
 ///
 /// Gets some room account data for the sender user.
 pub(crate) async fn get_room_account_data_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	body: Ruma<get_room_account_data::v3::Request>,
 ) -> Result<get_room_account_data::v3::Response> {
 	let sender_user = body.sender_user();

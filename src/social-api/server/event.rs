@@ -1,7 +1,7 @@
 use axum::extract::State;
 use conduwuit::{Result, err};
 use ruma::{MilliSecondsSinceUnixEpoch, RoomId, api::federation::event::get_event};
-
+use service::Services;
 use super::AccessCheck;
 use crate::Ruma;
 
@@ -12,7 +12,7 @@ use crate::Ruma;
 /// - Only works if a user of this server is currently invited or joined the
 ///   room
 pub(crate) async fn get_event_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	body: Ruma<get_event::v1::Request>,
 ) -> Result<get_event::v1::Response> {
 	let event = services

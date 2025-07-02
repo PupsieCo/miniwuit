@@ -22,7 +22,7 @@ const LIMIT_DEFAULT: usize = 10;
 /// - Hides any local users that aren't in any public rooms (i.e. those that
 ///   have the join rule set to public) and don't share a room with the sender
 pub(crate) async fn search_users_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	body: Ruma<search_users::v3::Request>,
 ) -> Result<search_users::v3::Response> {
 	let sender_user = body.sender_user();

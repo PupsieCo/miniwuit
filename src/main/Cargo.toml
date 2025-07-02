@@ -153,6 +153,7 @@ conduwuit-core.workspace = true
 conduwuit-database.workspace = true
 conduwuit-router.workspace = true
 conduwuit-service.workspace = true
+conduwuit-service-api.workspace = true
 conduwuit-social-service.workspace = true
 
 clap.workspace = true

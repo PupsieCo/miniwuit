@@ -63,7 +63,7 @@ const LIMIT_DEFAULT: usize = 10;
 /// - Only works if the user is joined (TODO: always allow, but only show events
 ///   where the user was joined, depending on `history_visibility`)
 pub(crate) async fn get_message_events_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	body: Ruma<get_message_events::v3::Request>,
 ) -> Result<get_message_events::v3::Response> {
 	debug_assert!(IGNORED_MESSAGE_TYPES.is_sorted(), "IGNORED_MESSAGE_TYPES is not sorted");

@@ -8,7 +8,7 @@ use crate::Ruma;
 ///
 /// Get information about the user that generated the OpenID token.
 pub(crate) async fn get_openid_userinfo_route(
-	State(services): State<crate::State>,
+	State(services): State<conduwuit_router::State<service::Services>>,
 	body: Ruma<get_openid_userinfo::v1::Request>,
 ) -> Result<get_openid_userinfo::v1::Response> {
 	Ok(get_openid_userinfo::v1::Response::new(

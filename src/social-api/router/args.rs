@@ -11,7 +11,7 @@ use ruma::{
 use service::Services;
 
 use super::{auth, auth::Auth, request, request::Request};
-use crate::{State, service::appservice::RegistrationInfo};
+use crate::{service::appservice::RegistrationInfo};
 
 /// Extractor for Ruma request structs
 pub(crate) struct Args<T> {
@@ -80,7 +80,7 @@ where
 }
 
 #[async_trait]
-impl<T> FromRequest<State, Body> for Args<T>
+impl<T> FromRequest<conduwuit_router::State<Services>, Body> for Args<T>
 where
 	T: IncomingRequest + Send + Sync + 'static,
 {
@@ -88,7 +88,7 @@ where
 
 	async fn from_request(
 		request: hyper::Request<Body>,
-		services: &State,
+		services: &conduwuit_router::State<Services>,
 	) -> Result<Self, Self::Rejection> {
 		let mut request = request::from(services, request).await?;
 		let mut json_body = serde_json::from_slice::<CanonicalJsonValue>(&request.body).ok();
